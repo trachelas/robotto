@@ -1,44 +1,44 @@
 'use strict';
 
-var path = require('path');
-var gulp = require('gulp');
-var excludeGitignore = require('gulp-exclude-gitignore');
-var mocha = require('gulp-mocha');
-var istanbul = require('gulp-istanbul');
-var nsp = require('gulp-nsp');
-var plumber = require('gulp-plumber');
-var coveralls = require('gulp-coveralls');
-var jscs = require('gulp-jscs');
-var babel = require('gulp-babel');
+const path = require('path');
+const gulp = require('gulp');
+const excludeGitignore = require('gulp-exclude-gitignore');
+const mocha = require('gulp-mocha');
+const istanbul = require('gulp-istanbul');
+const nsp = require('gulp-nsp');
+const plumber = require('gulp-plumber');
+const coveralls = require('gulp-coveralls');
+const jscs = require('gulp-jscs');
+const babel = require('gulp-babel');
 
-gulp.task('nsp', function(cb) {
+gulp.task('nsp', (cb) => {
     nsp('package.json', cb);
 });
 
-gulp.task('pre-test', function() {
-    return gulp.src('lib\**\*.js')
+gulp.task('pre-test', () => {
+    return gulp.src('src\**\*.js')
         .pipe(istanbul({
             includeUntested: true
         }))
         .pipe(istanbul.hookRequire());
 });
 
-gulp.task('test', ['pre-test'], function(cb) {
-    var mochaErr;
+gulp.task('test', ['pre-test'], (cb) => {
+    let mochaErr;
 
     gulp.src('test/**/*.js')
         .pipe(plumber())
         .pipe(mocha({reporter: 'spec'}))
-        .on('error', function(err) {
+        .on('error', (err) => {
             mochaErr = err;
         })
         .pipe(istanbul.writeReports())
-        .on('end', function() {
+        .on('end', () => {
             cb(mochaErr);
         });
 });
 
-gulp.task('coveralls', ['test'], function() {
+gulp.task('coveralls', ['test'], () => {
     if (!process.env.CI) {
         return;
     }
@@ -47,13 +47,13 @@ gulp.task('coveralls', ['test'], function() {
         .pipe(coveralls());
 });
 
-gulp.task('babel', function() {
+gulp.task('babel', () => {
     return gulp.src('src/**/*.js')
         .pipe(babel())
         .pipe(gulp.dest('lib'));
 });
 
-gulp.task('jscs', function() {
+gulp.task('jscs', () => {
     return gulp.src('**/*.js')
         .pipe(excludeGitignore())
         .pipe(jscs())

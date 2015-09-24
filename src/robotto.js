@@ -1,18 +1,18 @@
 'use strict';
-var request = require('request');
-var util = require('util');
-var EventEmitter = require('events').EventEmitter;
+
+const request = require('request');
+const util = require('util');
+const EventEmitter = require('events').EventEmitter;
 
 function Robotto() {
 }
 util.inherits(Robotto, EventEmitter);
 
 Robotto.prototype.fetch = function(url, callback) {
-    var self = this;
-    request(url, function(error, response, body) {
+    request(url, (error, response, body) => {
         if (!error && response.statusCode === 200) {
-            var robotsObject = self.parseRobots(body);
-            self.emit('done', robotsObject);
+            let robotsObject = this.parseRobots(body);
+            this.emit('done', robotsObject);
         }
     });
 };

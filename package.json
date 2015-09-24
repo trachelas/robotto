@@ -48,5 +48,6 @@
   "license": "MIT",
   "dependencies": {
     "request": "^2.63.0"
-  }
+  },
+  "engine": "node >= 4.0.0"
 }
