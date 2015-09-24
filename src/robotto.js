@@ -9,11 +9,10 @@ function Robotto() {
 util.inherits(Robotto, EventEmitter);
 
 Robotto.prototype.fetch = function(url, callback) {
-    var self = this;
-    request(url, function(error, response, body) {
+    request(url, (error, response, body) => {
         if (!error && response.statusCode === 200) {
-            var robotsObject = self.parseRobots(body);
-            self.emit('done', robotsObject);
+            var robotsObject = this.parseRobots(body);
+            this.emit('done', robotsObject);
         }
     });
 };

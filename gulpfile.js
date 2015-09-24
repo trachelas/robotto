@@ -11,11 +11,11 @@ const coveralls = require('gulp-coveralls');
 const jscs = require('gulp-jscs');
 const babel = require('gulp-babel');
 
-gulp.task('nsp', function(cb) {
+gulp.task('nsp', (cb) => {
     nsp('package.json', cb);
 });
 
-gulp.task('pre-test', function() {
+gulp.task('pre-test', () => {
     return gulp.src('src\**\*.js')
         .pipe(istanbul({
             includeUntested: true
@@ -23,22 +23,22 @@ gulp.task('pre-test', function() {
         .pipe(istanbul.hookRequire());
 });
 
-gulp.task('test', ['pre-test'], function(cb) {
+gulp.task('test', ['pre-test'], (cb) => {
     var mochaErr;
 
     gulp.src('test/**/*.js')
         .pipe(plumber())
         .pipe(mocha({reporter: 'spec'}))
-        .on('error', function(err) {
+        .on('error', (err) => {
             mochaErr = err;
         })
         .pipe(istanbul.writeReports())
-        .on('end', function() {
+        .on('end', () => {
             cb(mochaErr);
         });
 });
 
-gulp.task('coveralls', ['test'], function() {
+gulp.task('coveralls', ['test'], () => {
     if (!process.env.CI) {
         return;
     }
@@ -47,13 +47,13 @@ gulp.task('coveralls', ['test'], function() {
         .pipe(coveralls());
 });
 
-gulp.task('babel', function() {
+gulp.task('babel', () => {
     return gulp.src('src/**/*.js')
         .pipe(babel())
         .pipe(gulp.dest('lib'));
 });
 
-gulp.task('jscs', function() {
+gulp.task('jscs', () => {
     return gulp.src('**/*.js')
         .pipe(excludeGitignore())
         .pipe(jscs())
