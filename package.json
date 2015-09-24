@@ -10,7 +10,11 @@
     "url": "http://lucasfcosta.com"
   },
   "contributors": [
-    "Lucas Vieira <vieiralucas4@gmail.com>"
+    {
+      "name": "Lucas Vieira",
+      "email": "vieiralucas4@gmail.com",
+      "url": "vieiralucas.com"
+    }
   ],
   "files": [
     "lib"
@@ -29,17 +33,17 @@
   "devDependencies": {
     "gulp": "^3.6.0",
     "gulp-babel": "^5.2.1",
-    "gulp-eslint": "^1.0.0",
+    "gulp-coveralls": "^0.1.0",
     "gulp-exclude-gitignore": "^1.0.0",
     "gulp-istanbul": "^0.9.0",
+    "gulp-jscs": "^3.0.0",
     "gulp-mocha": "^2.0.0",
-    "gulp-plumber": "^1.0.0",
     "gulp-nsp": "^0.4.5",
-    "gulp-coveralls": "^0.1.0"
+    "gulp-plumber": "^1.0.0"
   },
   "scripts": {
     "prepublish": "gulp prepublish",
-    "test": "gulp"
+    "test": "gulp test"
   },
   "license": "MIT",
   "dependencies": {
