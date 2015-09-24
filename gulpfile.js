@@ -1,22 +1,22 @@
 'use strict';
 
-var path = require('path');
-var gulp = require('gulp');
-var excludeGitignore = require('gulp-exclude-gitignore');
-var mocha = require('gulp-mocha');
-var istanbul = require('gulp-istanbul');
-var nsp = require('gulp-nsp');
-var plumber = require('gulp-plumber');
-var coveralls = require('gulp-coveralls');
-var jscs = require('gulp-jscs');
-var babel = require('gulp-babel');
+const path = require('path');
+const gulp = require('gulp');
+const excludeGitignore = require('gulp-exclude-gitignore');
+const mocha = require('gulp-mocha');
+const istanbul = require('gulp-istanbul');
+const nsp = require('gulp-nsp');
+const plumber = require('gulp-plumber');
+const coveralls = require('gulp-coveralls');
+const jscs = require('gulp-jscs');
+const babel = require('gulp-babel');
 
 gulp.task('nsp', function(cb) {
     nsp('package.json', cb);
 });
 
 gulp.task('pre-test', function() {
-    return gulp.src('lib\**\*.js')
+    return gulp.src('src\**\*.js')
         .pipe(istanbul({
             includeUntested: true
         }))

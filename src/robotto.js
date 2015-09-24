@@ -1,7 +1,8 @@
 'use strict';
-var request = require('request');
-var util = require('util');
-var EventEmitter = require('events').EventEmitter;
+
+const request = require('request');
+const util = require('util');
+const EventEmitter = require('events').EventEmitter;
 
 function Robotto() {
 }

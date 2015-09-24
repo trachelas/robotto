@@ -1,8 +1,8 @@
 // jscs:disable maximumLineLength
 'use strict';
 
-var assert = require('assert');
-var robotto = require('../lib');
+const assert = require('assert');
+const robotto = require('../lib');
 
 describe('robotto', function() {
     it('should have unit test!', function() {
