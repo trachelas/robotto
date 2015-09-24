@@ -11,7 +11,7 @@ util.inherits(Robotto, EventEmitter);
 Robotto.prototype.fetch = function(url, callback) {
     request(url, (error, response, body) => {
         if (!error && response.statusCode === 200) {
-            var robotsObject = this.parseRobots(body);
+            let robotsObject = this.parseRobots(body);
             this.emit('done', robotsObject);
         }
     });

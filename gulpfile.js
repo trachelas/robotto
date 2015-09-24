@@ -24,7 +24,7 @@ gulp.task('pre-test', () => {
 });
 
 gulp.task('test', ['pre-test'], (cb) => {
-    var mochaErr;
+    let mochaErr;
 
     gulp.src('test/**/*.js')
         .pipe(plumber())
