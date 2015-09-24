@@ -16,6 +16,7 @@ gulp.task('static', function () {
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
 });
+var babel = require('gulp-babel');
 
 gulp.task('nsp', function (cb) {
   nsp('package.json', cb);
@@ -49,9 +50,16 @@ gulp.task('coveralls', ['test'], function () {
     return;
   }
 
+gulp.task('babel', function () {
+    return gulp.src('src/**/*.js')
+        .pipe(babel())
+        .pipe(gulp.dest('lib'));
+});
+
   return gulp.src(path.join(__dirname, 'coverage/lcov.info'))
     .pipe(coveralls());
 });
 
-gulp.task('prepublish', ['nsp']);
 gulp.task('default', ['static', 'test', 'coveralls']);
+
+gulp.task('prepublish', ['test', 'nsp', 'babel']);
