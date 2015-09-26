@@ -15,10 +15,16 @@ Robotto.prototype.fetch = function(url, callback) {
 
 Robotto.prototype.parseRobots = function(robotsFile) {
   var lines = robotsFile.split('\n');
-  var rulesObj = {};
+  var rulesObj = {
+    comments: []
+  };
 
   for (let i = 0; i < lines.length; i++) {
     let result;
+
+    if ((result = /^#(.*)/i.exec(lines[i])) !== null) {
+      rulesObj.comments.push(result[1]);
+    }
 
     // If it finds an User-agent creates a new key into the rules object
     if ((result = /^User-agent: (.*)/i.exec(lines[i])) !== null) {
@@ -29,7 +35,6 @@ Robotto.prototype.parseRobots = function(robotsFile) {
         value: {
           allow: [],
           disallow: [],
-          comments: []
         }
       });
 
@@ -41,8 +46,6 @@ Robotto.prototype.parseRobots = function(robotsFile) {
           rulesObj[result[1]].allow.push(permissionResult[1]);
         } if ((permissionResult = /^Disallow: (.*)/i.exec(lines[i+j])) !== null) {
           rulesObj[result[1]].disallow.push(permissionResult[1]);
-        } if ((permissionResult = /^#(.*)/.exec(lines[i+j])) !== null) {
-          rulesObj[result[1]].comments.push(permissionResult[1]);
         }
         j++;
       }
