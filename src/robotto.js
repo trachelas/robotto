@@ -1,8 +1,8 @@
 'use strict';
 const request = require('request');
 
-function Robotto(cacheEnabled) {
-    this.cacheEnabled = cacheEnabled || false;
+function Robotto(options) {
+    this.cacheEnabled = options.cacheEnabled || false;
     this.cache = {};
 }
 
