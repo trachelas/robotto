@@ -28,7 +28,8 @@ Robotto.prototype.parseRobots = function(robotsFile) {
         enumerable: true,
         value: {
           allow: [],
-          disallow: []
+          disallow: [],
+          comments: []
         }
       });
 
@@ -40,6 +41,8 @@ Robotto.prototype.parseRobots = function(robotsFile) {
           rulesObj[result[1]].allow.push(permissionResult[1]);
         } if ((permissionResult = /^Disallow: (.*)/i.exec(lines[i+j])) !== null) {
           rulesObj[result[1]].disallow.push(permissionResult[1]);
+        } if ((permissionResult = /^#(.*)/.exec(lines[i+j])) !== null) {
+          rulesObj[result[1]].comments.push(permissionResult[1]);
         }
         j++;
       }
