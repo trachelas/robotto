@@ -18,3 +18,5 @@ Robotto.prototype.parseRobots = function(robotsFile) {
     // Nice example to test: https://www.npmjs.com/robots.txt
     // Rules about robots.txt: http://www.robotstxt.org/robotstxt.html
 };
+
+module.exports = Robotto;
