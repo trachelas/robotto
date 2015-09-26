@@ -11,6 +11,8 @@ Robotto.prototype.fetch = function(url, callback) {
   request(url, (error, response, body) => {
     if (!error && response.statusCode === 200) {
       let robotsRules = this.parseRobots(body);
+
+      // If this robotto has cache enabled it will store the fetched rule
       if (this.cacheEnabled) {
         Object.defineProperty(this.cache, this.getDomain(url), {
           configurable: true,
@@ -19,6 +21,7 @@ Robotto.prototype.fetch = function(url, callback) {
           value: robotsRules
         });
       }
+
       callback(robotsRules);
     }
   });
