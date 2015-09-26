@@ -27,6 +27,7 @@ gulp.task('test', ['pre-test'], (cb) => {
     let mochaErr;
 
     gulp.src('test/**/*.js')
+        .pipe(babel())
         .pipe(plumber())
         .pipe(mocha({reporter: 'spec'}))
         .on('error', (err) => {
