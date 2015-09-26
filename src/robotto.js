@@ -1,20 +1,35 @@
 'use strict';
 const request = require('request');
+const url = require('url');
 
 function Robotto(options) {
     this.cacheEnabled = options.cacheEnabled || false;
     this.cache = {};
 }
 
-Robotto.prototype.fetch = function(url, callback) {
-    url = this.getRobotsUrl(url);
-    request(url, (error, response, body) => {
-        if (!error && response.statusCode === 200) {
+Robotto.prototype.fetch = function(urlParam, callback) {
+    if (this.cacheEnabled) {
+        let cache = this.cache[url.parse(urlParam).host];
+
+        if (cache) {
+            callback(null, cache);
+            return;
+        }
+    }
+
+    urlParam = this.getRobotsUrl(url);
+    request(urlParam.href, (error, response, body) => {
+        if (error) {
+            callback(error);
+            return;
+        }
+
+        if (response.statusCode === 200) {
             let robotsRules = this.parseRobots(body);
 
             // If this robotto has cache enabled it will store the fetched rule
             if (this.cacheEnabled) {
-                Object.defineProperty(this.cache, this.getDomain(url), {
+                Object.defineProperty(this.cache, urlParam.host, {
                     configurable: true,
                     writable: true,
                     enumerable: true,
@@ -22,21 +37,14 @@ Robotto.prototype.fetch = function(url, callback) {
                 });
             }
 
-            callback(robotsRules);
+            callback(null, robotsRules);
         }
     });
 };
 
-Robotto.prototype.getRobotsUrl = function(url) {
-    var splitResult = url.split('/');
-    url = splitResult[0] +  '//' + splitResult[2];
-    url += '/robots.txt';
-
-    return url;
-};
-
-Robotto.prototype.getDomain = function(url) {
-    return url.split('/')[2];
+Robotto.prototype.getRobotsUrl = function(urlParam) {
+    let receivedUrl =  url.parse(urlParam);
+    return url.parse(`${receivedUrl.protocol}\/\/${receivedUrl.host}/robots.txt`);
 };
 
 Robotto.prototype.parseRobots = function(robotsFile) {
