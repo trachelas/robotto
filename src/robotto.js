@@ -1,7 +1,9 @@
 'use strict';
 const request = require('request');
 
-function Robotto() {
+function Robotto(cacheEnabled) {
+  this.cacheEnabled = cacheEnabled || false;
+  this.cache = {};
 }
 
 Robotto.prototype.fetch = function(url, callback) {
@@ -9,6 +11,14 @@ Robotto.prototype.fetch = function(url, callback) {
   request(url, (error, response, body) => {
     if (!error && response.statusCode === 200) {
       let robotsRules = this.parseRobots(body);
+      if (this.cacheEnabled) {
+        Object.defineProperty(this.cache, url, {
+          configurable: true,
+          writable: true,
+          enumerable: true,
+          value: robotsRules
+        });
+      }
       callback(robotsRules);
     }
   });
@@ -63,5 +73,7 @@ Robotto.prototype.parseRobots = function(robotsFile) {
 
   return rulesObj;
 };
+
+
 
 module.exports = Robotto;
