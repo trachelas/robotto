@@ -5,6 +5,7 @@ function Robotto() {
 }
 
 Robotto.prototype.fetch = function(url, callback) {
+  url = this.getRobotsUrl(url);
   request(url, (error, response, body) => {
     if (!error && response.statusCode === 200) {
       let robotsRules = this.parseRobots(body);
@@ -12,6 +13,14 @@ Robotto.prototype.fetch = function(url, callback) {
     }
   });
 };
+
+Robotto.prototype.getRobotsUrl = function(url) {
+  var splitResult = url.split('/');
+  url = splitResult[0] +  '//' + splitResult[2];
+  url += '/robots.txt';
+
+  return url;
+}
 
 Robotto.prototype.parseRobots = function(robotsFile) {
   var lines = robotsFile.split('\n');
