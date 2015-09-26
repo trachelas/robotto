@@ -12,7 +12,7 @@ Robotto.prototype.fetch = function(url, callback) {
     if (!error && response.statusCode === 200) {
       let robotsRules = this.parseRobots(body);
       if (this.cacheEnabled) {
-        Object.defineProperty(this.cache, url, {
+        Object.defineProperty(this.cache, this.getDomain(url), {
           configurable: true,
           writable: true,
           enumerable: true,
@@ -30,6 +30,10 @@ Robotto.prototype.getRobotsUrl = function(url) {
   url += '/robots.txt';
 
   return url;
+}
+
+Robotto.prototype.getDomain = function(url) {
+  return url.split('/')[2];
 }
 
 Robotto.prototype.parseRobots = function(robotsFile) {
@@ -73,7 +77,5 @@ Robotto.prototype.parseRobots = function(robotsFile) {
 
   return rulesObj;
 };
-
-
 
 module.exports = Robotto;
