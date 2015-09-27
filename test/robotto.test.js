@@ -81,9 +81,59 @@ describe('robotto', () => {
     });
 
     describe('parse', () => {
-        it('should return a rule object indexed by user agent', () => {
-            let rules = robotto.parse(fake.robots());
-            assert.deepEqual(rules, fake.rules());
+        it('should undertand comments', () => {
+            let robotsFile = [
+                '# comment 1',
+                'User-agent: 007 # comment 2'
+            ].join('\n');
+            let comments = ['comment 1', 'comment 2'];
+
+            assert.deepEqual(robotto.parse(robotsFile).comments, comments);
+        });
+
+        it('should index by User-agent', () => {
+            let robotsFile = [
+                '# comment 1',
+                'User-agent: 007 # comment 2',
+                'Allow: /kill/',
+                'User-agent: Agent 47',
+                'Disallow: /nothing/'
+            ].join('\n');
+
+            assert.property(robotto.parse(robotsFile), '007');
+            assert.property(robotto.parse(robotsFile), 'Agent 47');
+        });
+
+        it('should put allow entries in their respective User-agents', () => {
+            let robotsFile = [
+                '# comment 1',
+                'User-agent: 007 # comment 2',
+                'Allow: /kill/',
+                'User-agent: Agent 47',
+                'Allow: /everything/'
+            ].join('\n');
+            let rules = robotto.parse(robotsFile);
+
+            assert.deepEqual(rules['007'].allow, ['/kill/']);
+            assert.deepEqual(rules['Agent 47'].allow, ['/everything/']);
+        });
+
+        it('should put disallow entries in their respective User-agents', () => {
+            let robotsFile = [
+                '# comment 1',
+                'User-agent: 007 # comment 2',
+                'Disallow: /betrayal/',
+                'User-agent: Agent 47',
+                'Disallow: /nothing/'
+            ].join('\n');
+            let rules = robotto.parse(robotsFile);
+
+            assert.deepEqual(rules['007'].disallow, ['/betrayal/']);
+            assert.deepEqual(rules['Agent 47'].disallow, ['/nothing/']);
+        });
+
+        it('should actually parse a robots.txt file', () => {
+            assert.deepEqual(robotto.parse(fake.robots()), fake.rules());
         });
     });
 });
