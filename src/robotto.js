@@ -82,4 +82,40 @@ robotto.parse = function(robotsFile) {
     return rulesObj;
 };
 
+robotto._stripRoute = function(urlParam) {
+    // Removes domain name and returns only the endPoint
+    return urlParam.replace(/^.*\/\/[^\/]+/, '');
+};
+
+robotto.check = function(userAgent, urlParam, rulesObj) {
+    let userAgents = Object.keys(rulesObj);
+    let desiredRoute = this._stripRoute(urlParam) + '/';
+    let allowed = true;
+
+    // Searches for every user agent until it gets a match
+    userAgents.forEach((agent) => {
+        if (agent.indexOf(userAgent) === 0) {
+            // Check if route is disallowed
+            let disallowedRoutes = rulesObj[agent].disallow;
+            disallowedRoutes.forEach((route) => {
+                if (desiredRoute.indexOf(route) === 0) {
+                    allowed = false;
+                }
+            });
+        }
+    });
+
+    // Checks the general rules
+    if (userAgents.indexOf('*') !== -1) {
+        let allDisallowedRoutes = rulesObj['*'].disallow;
+        allDisallowedRoutes.forEach((route) => {
+            if (desiredRoute.indexOf(route) === 0) {
+                allowed = false;
+            }
+        });
+    }
+
+    return allowed;
+};
+
 module.exports = robotto;

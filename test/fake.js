@@ -11,6 +11,9 @@ fake.response = function() {
 fake.robots = function() {
     return [
         '#comment 1',
+        'user-agent: *',
+        'allow: /love/',
+        'disallow: /spies/',
         'User-agent: 007',
         'Disallow: /admin/',
         '#comment 2',
@@ -21,6 +24,10 @@ fake.robots = function() {
 fake.rules = function() {
     return {
         comments: ['comment 1', 'comment 2'],
+        '*': {
+            allow: ['/love/'],
+            disallow: ['/spies/']
+        },
         '007': {
             allow: ['/blog-post/'],
             disallow: ['/admin/']
