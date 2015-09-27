@@ -162,12 +162,34 @@ describe('robotto', () => {
             assert.strictEqual(permission2, false);
         });
 
-        it('should find an allowed route for a non-specified agent', () => {
-            let permission1 = robotto.check('NotKnownSpy', 'http://secrets.com/love/pierce-brosnan', fake.rules());
-            let permission2 = robotto.check('NotKnownSpy', 'http://secrets.com/love', fake.rules());
+        it('should know every route is disallowed for a specified user agent', () => {
+            let rules = {
+                comments: ['comment 1'],
+                '007': {
+                    allow: [],
+                    disallow: ['*']
+                }
+            };
 
-            assert.strictEqual(permission1, true);
-            assert.strictEqual(permission2, true);
+            let permission = robotto.check('007', 'http://secrets.com/crazy-route/whatever', rules);
+            assert.strictEqual(permission, false);
+        });
+
+        it('should know every route is disallowed for a non-specified user agent', () => {
+            let rules = {
+                comments: ['comment 1'],
+                '*': {
+                    allow: [],
+                    disallow: ['*']
+                },
+                '007': {
+                    allow: [],
+                    disallow: ['/spies/']
+                }
+            }
+
+            let permission = robotto.check('NotKnownSpy', 'http://secrets.com/crazy-route/whatever', rules);
+            assert.strictEqual(permission, false);
         });
     });
 });

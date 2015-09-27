@@ -100,6 +100,8 @@ robotto.check = function(userAgent, urlParam, rulesObj) {
             disallowedRoutes.forEach((route) => {
                 if (desiredRoute.indexOf(route) === 0) {
                     allowed = false;
+                } else if (route.indexOf('*') === 0) {
+                    allowed = false;
                 }
             });
         }
@@ -110,6 +112,8 @@ robotto.check = function(userAgent, urlParam, rulesObj) {
         let allDisallowedRoutes = rulesObj['*'].disallow;
         allDisallowedRoutes.forEach((route) => {
             if (desiredRoute.indexOf(route) === 0) {
+                allowed = false;
+            } else if (route.indexOf('*') === 0) {
                 allowed = false;
             }
         });
