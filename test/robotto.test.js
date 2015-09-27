@@ -186,7 +186,7 @@ describe('robotto', () => {
                     allow: [],
                     disallow: ['/spies/']
                 }
-            }
+            };
 
             let permission = robotto.check('NotKnownSpy', 'http://secrets.com/crazy-route/whatever', rules);
             assert.strictEqual(permission, false);
