@@ -124,4 +124,19 @@ robotto.check = function(userAgent, urlParam, rulesObj) {
     return allowed;
 };
 
+robotto.canCrawl = function(userAgent, urlParam, callback) {
+    callback = typeof callback === 'function' ? callback : new Function();
+
+    this.fetch(urlParam, (err, robotsTxt) => {
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        let rules = this.parse(robotsTxt);
+        let canCrawl = this.check(userAgent, urlParam, rules);
+        callback(null, canCrawl);
+    });
+};
+
 module.exports = robotto;
