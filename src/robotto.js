@@ -56,9 +56,9 @@ robotto.parse = function(robotsFile) {
             line = portions[0].trim(); // exclude comment from line
         }
 
-        let userAgentIndex = line.indexOf('User-agent:');
+        let userAgentIndex = line.toLowerCase().indexOf('user-agent:');
         if (userAgentIndex === 0) {
-            lastUserAgent = line.split('User-agent:')[1].trim();
+            lastUserAgent = /^User-agent: (.*)/i.exec(line)[1];
             rulesObj[lastUserAgent] = {
                 allow: [],
                 disallow: []
@@ -66,15 +66,15 @@ robotto.parse = function(robotsFile) {
             return;
         }
 
-        let allowIndex = line.indexOf('Allow:');
+        let allowIndex = line.toLowerCase().indexOf('allow:');
         if (allowIndex === 0) {
-            rulesObj[lastUserAgent].allow.push(line.split('Allow:')[1].trim());
+            rulesObj[lastUserAgent].allow.push(/^Allow: (.*)/i.exec(line)[1]);
             return;
         }
 
-        let disallowIndex = line.indexOf('Disallow:');
+        let disallowIndex = line.toLowerCase().indexOf('disallow:');
         if (disallowIndex === 0) {
-            rulesObj[lastUserAgent].disallow.push(line.split('Disallow:')[1].trim());
+            rulesObj[lastUserAgent].disallow.push(/^Disallow: (.*)/i.exec(line)[1]);
             return;
         }
     });
