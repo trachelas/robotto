@@ -24,7 +24,7 @@ robotto.fetch = function(urlP, callback) {
         }
 
         if (res.statusCode !== 200) {
-            callback(new Error(`Could not fetch robots.txt from ${urlP}. Server response code: ${res.statusCode} `));
+            callback(new Error(`Could not fetch robots.txt from ${urlP}. Server response code: ${res.statusCode}`));
             return;
         }
 

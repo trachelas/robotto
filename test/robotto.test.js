@@ -66,7 +66,7 @@ describe('robotto', () => {
                 .callsArgWith(1, null, {statusCode: 404});
 
             robotto.fetch(coolUrl, (err) => {
-                assert.deepEqual(err.message, `Could not fetch robots.txt from ${coolUrl}, the server returned 404 code`);
+                assert.deepEqual(err.message, `Could not fetch robots.txt from ${coolUrl}. Server response code: 404`);
                 done();
             });
         });
