@@ -81,7 +81,7 @@ describe('robotto', () => {
     });
 
     describe('parse', () => {
-        it('should undertand comments', () => {
+        it('should understand comments', () => {
             let robotsFile = [
                 '# comment 1',
                 'User-agent: 007 # comment 2'
