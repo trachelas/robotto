@@ -1,20 +1,19 @@
 // jscs:disable maximumLineLength
 'use strict';
 
-const assert = require('assert');
-const Robotto = require('../src/robotto');
+const assert = require('chai').assert;
+const robotto = require('../src/robotto');
 
-let robotto;
+let coolUrl = 'http://my-cool-domain.com/blog-post/1';
+let coolRobot = 'http://my-cool-domain.com/robots.txt';
 
 describe('robotto', () => {
-    beforeEach(() => {
-        robotto = new Robotto();
     });
 
-    describe('getRobotsUrl', () => {
-        it('should return the robots.txt path for a url', () => {
-            let url = robotto.getRobotsUrl('http://my-cool-url.com/blog-post/1');
-            assert.deepEqual('http://my-cool-url.com/robots.txt', url.href);
+    describe('_getRobotsUrl', () => {
+        it('returns robots.txt url for given host', () => {
+            let robotsUrl = robotto._getRobotsUrl(coolUrl);
+            assert.deepEqual(robotsUrl, coolRobot);
         });
     });
 });
