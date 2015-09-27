@@ -1,94 +1,85 @@
 'use strict';
+
 const request = require('request');
 const url = require('url');
 
-function Robotto(options) {
-    this.cacheEnabled = options.cacheEnabled || false;
-    this.cache = {};
-}
+let robotto = {};
 
-Robotto.prototype.fetch = function(urlParam, callback) {
-    if (this.cacheEnabled) {
-        let cache = this.cache[url.parse(urlParam).host];
+robotto._getRobotsUrl = function(urlP) {
+    let receivedUrl = url.parse(urlP);
+    return `${receivedUrl.protocol}\/\/${receivedUrl.host}/robots.txt`;
+};
 
-        if (cache) {
-            callback(null, cache);
+robotto._request = request;
+
+robotto.fetch = function(urlP, callback) {
+    callback = typeof callback === 'function' ? callback : new Function();
+
+    let robotsUrl = robotto._getRobotsUrl(urlP);
+
+    robotto._request(robotsUrl, (err, res, body) => {
+        if (err) {
+            callback(err);
             return;
         }
-    }
 
-    urlParam = this.getRobotsUrl(url);
-    request(urlParam.href, (error, response, body) => {
-        if (error) {
-            callback(error);
+        if (res.statusCode !== 200) {
+            callback(new Error(`Could not fetch robots.txt from ${urlP}, the server returned ${res.statusCode} code`));
             return;
         }
 
-        if (response.statusCode === 200) {
-            let robotsRules = this.parseRobots(body);
-
-            // If this robotto has cache enabled it will store the fetched rule
-            if (this.cacheEnabled) {
-                Object.defineProperty(this.cache, urlParam.host, {
-                    configurable: true,
-                    writable: true,
-                    enumerable: true,
-                    value: robotsRules
-                });
-            }
-
-            callback(null, robotsRules);
-        }
+        callback(null, body);
     });
 };
 
-Robotto.prototype.getRobotsUrl = function(urlParam) {
-    let receivedUrl =  url.parse(urlParam);
-    return url.parse(`${receivedUrl.protocol}\/\/${receivedUrl.host}/robots.txt`);
-};
-
-Robotto.prototype.parseRobots = function(robotsFile) {
-    var lines = robotsFile.split('\n');
-    var rulesObj = {
+robotto.parse = function(robotsFile) {
+    let lines = robotsFile.split('\n');
+    let rulesObj = {
         comments: []
     };
+    let lastUserAgent;
 
-    for (let i = 0; i < lines.length; i++) {
-        let result;
+    lines.forEach((line) => {
+        let hashIndex = line.indexOf('#');
 
-        if ((result = /^#(.*)/i.exec(lines[i])) !== null) {
-            rulesObj.comments.push(result[1]);
-        }
-
-        // If it finds an User-agent creates a new key into the rules object
-        if ((result = /^User-agent: (.*)/i.exec(lines[i])) !== null) {
-            Object.defineProperty(rulesObj, result[1], {
-                configurable: true,
-                writable: true,
-                enumerable: true,
-                value: {
-                    allow: [],
-                    disallow: [],
-                }
-            });
-
-            // Look for Allowed Routes until it finds another user agent definition
-            var j = 1;
-            let permissionResult;
-            while ((permissionResult = /^User-agent: (.*)/i.exec(lines[i + j])) === null && j < lines.length) {
-                if ((permissionResult = /^Allow: (.*)/i.exec(lines[i + j])) !== null) {
-                    rulesObj[result[1]].allow.push(permissionResult[1]);
-                }
-
-                if ((permissionResult = /^Disallow: (.*)/i.exec(lines[i + j])) !== null) {
-                    rulesObj[result[1]].disallow.push(permissionResult[1]);
-                }
-                j++;
+        if (hashIndex > -1) {
+            if (hashIndex === 0) {
+                // entire line commentary
+                rulesObj.comments.push(line.substr(hashIndex + 1).trim());
+                return;
             }
+
+            // portion line comment
+            let portions = line.split('#');
+
+            rulesObj.comments.push(portions[1].trim()); // push comment
+            line = portions[0].trim(); // exclude comment from line
         }
-    }
+
+        let userAgentIndex = line.indexOf('User-agent:');
+        if (userAgentIndex === 0) {
+            lastUserAgent = line.split('User-agent:')[1].trim();
+            rulesObj[lastUserAgent] = {
+                allow: [],
+                disallow: []
+            };
+            return;
+        }
+
+        let allowIndex = line.indexOf('Allow:');
+        if (allowIndex === 0) {
+            rulesObj[lastUserAgent].allow.push(line.split('Allow:')[1].trim());
+            return;
+        }
+
+        let disallowIndex = line.indexOf('Disallow:');
+        if (disallowIndex === 0) {
+            rulesObj[lastUserAgent].disallow.push(line.split('Disallow:')[1].trim());
+            return;
+        }
+    });
 
     return rulesObj;
 };
 
-module.exports = Robotto;
+module.exports = robotto;

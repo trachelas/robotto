@@ -61,4 +61,8 @@ gulp.task('jscs', () => {
         .pipe(jscs.reporter());
 });
 
+gulp.task('watch', () => {
+    gulp.watch('**/*.js', ['prepublish']);
+});
+
 gulp.task('prepublish', ['jscs', 'test', 'nsp', 'babel']);
