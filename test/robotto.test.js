@@ -79,4 +79,11 @@ describe('robotto', () => {
             });
         });
     });
+
+    describe('parse', () => {
+        it('should return a rule object indexed by user agent', () => {
+            let rules = robotto.parse(fake.robots());
+            assert.deepEqual(rules, fake.rules());
+        });
+    });
 });

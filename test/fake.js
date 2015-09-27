@@ -9,9 +9,23 @@ fake.response = function() {
 };
 
 fake.robots = function() {
-    return 'User-agent: 007\n' +
-        'Disallow: /admin/\n' +
-        'Allow: /blog-post/';
+    return [
+        '#comment 1',
+        'User-agent: 007',
+        'Disallow: /admin/',
+        '#comment 2',
+        'Allow: /blog-post/'
+    ].join('\n');
+};
+
+fake.rules = function() {
+    return {
+        comments: ['comment 1', 'comment 2'],
+        '007': {
+            allow: ['/blog-post/'],
+            disallow: ['/admin/']
+        }
+    };
 };
 
 module.exports = fake;
