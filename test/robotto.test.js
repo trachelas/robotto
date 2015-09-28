@@ -167,7 +167,7 @@ describe('robotto', () => {
                 comments: ['comment 1'],
                 '007': {
                     allow: [],
-                    disallow: ['*']
+                    disallow: ['/']
                 }
             };
 
@@ -180,7 +180,7 @@ describe('robotto', () => {
                 comments: ['comment 1'],
                 '*': {
                     allow: [],
-                    disallow: ['*']
+                    disallow: ['/']
                 },
                 '007': {
                     allow: [],

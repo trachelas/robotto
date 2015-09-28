@@ -95,7 +95,7 @@ robotto.check = function(userAgent, urlParam, rulesObj) {
             disallowedRoutes.forEach((route) => {
                 if (desiredRoute.indexOf(route) === 0) {
                     allowed = false;
-                } else if (route.indexOf('*') === 0) {
+                } else if (route === '/') {
                     allowed = false;
                 }
             });
@@ -108,7 +108,7 @@ robotto.check = function(userAgent, urlParam, rulesObj) {
         allDisallowedRoutes.forEach((route) => {
             if (desiredRoute.indexOf(route) === 0) {
                 allowed = false;
-            } else if (route.indexOf('*') === 0) {
+            } else if (route === '/') {
                 allowed = false;
             }
         });
