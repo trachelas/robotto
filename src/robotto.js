@@ -82,14 +82,9 @@ robotto.parse = function(robotsFile) {
     return rulesObj;
 };
 
-robotto._stripRoute = function(urlParam) {
-    // Removes domain name and returns only the endPoint
-    return urlParam.replace(/^.*\/\/[^\/]+/, '');
-};
-
 robotto.check = function(userAgent, urlParam, rulesObj) {
     let userAgents = Object.keys(rulesObj);
-    let desiredRoute = this._stripRoute(urlParam) + '/';
+    let desiredRoute = url.parse(urlParam).pathname + '/';
     let allowed = true;
 
     // Searches for every user agent until it gets a match
