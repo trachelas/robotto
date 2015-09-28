@@ -91,14 +91,14 @@ robotto.check = function(userAgent, urlParam, rulesObj) {
     // Searches for every user agent until it gets a match
     // The 'return true' statements are used to break the .some() loop
     userAgents.some((agent) => {
-        if (agent.indexOf(userAgent) === 0) {
+        if (agent === userAgent) {
             // Check if route is disallowed
             let disallowedRoutes = rulesObj[agent].disallow;
             disallowedRoutes.some((route) => {
                 if (desiredRoute === route.split('/')[1]) {
                     allowed = false;
                     return true;
-                } else if (route === '/') {
+                  } else if (route === '/') {
                     allowed = false;
                     return true;
                 }
