@@ -89,28 +89,34 @@ robotto.check = function(userAgent, urlParam, rulesObj) {
     let allowed = true;
 
     // Searches for every user agent until it gets a match
-    userAgents.forEach((agent) => {
+    // The 'return true' statements are used to break the .some() loop
+    userAgents.some((agent) => {
         if (agent.indexOf(userAgent) === 0) {
             // Check if route is disallowed
             let disallowedRoutes = rulesObj[agent].disallow;
-            disallowedRoutes.forEach((route) => {
+            disallowedRoutes.some((route) => {
                 if (desiredRoute === route.split('/')[1]) {
                     allowed = false;
+                    return true;
                 } else if (route === '/') {
                     allowed = false;
+                    return true;
                 }
             });
+            return true;
         }
     });
 
     // Checks the general rules
     if (userAgents.indexOf('*') !== -1) {
         let allDisallowedRoutes = rulesObj['*'].disallow;
-        allDisallowedRoutes.forEach((route) => {
+        allDisallowedRoutes.some((route) => {
             if (desiredRoute === route.split('/')[1]) {
                 allowed = false;
+                return true;
             } else if (route === '/') {
                 allowed = false;
+                return true;
             }
         });
     }
