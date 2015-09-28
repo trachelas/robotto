@@ -84,7 +84,7 @@ robotto.parse = function(robotsFile) {
 
 robotto.check = function(userAgent, urlParam, rulesObj) {
     let userAgents = Object.keys(rulesObj);
-    let desiredRoute = url.parse(urlParam).pathname + '/';
+    let desiredRoute = (url.parse(urlParam).pathname + '/').split('/')[1];
     let allowed = true;
 
     // Searches for every user agent until it gets a match
@@ -93,7 +93,7 @@ robotto.check = function(userAgent, urlParam, rulesObj) {
             // Check if route is disallowed
             let disallowedRoutes = rulesObj[agent].disallow;
             disallowedRoutes.forEach((route) => {
-                if (desiredRoute.indexOf(route) === 0) {
+                if (desiredRoute === route.split('/')[1]) {
                     allowed = false;
                 } else if (route === '/') {
                     allowed = false;
@@ -106,7 +106,7 @@ robotto.check = function(userAgent, urlParam, rulesObj) {
     if (userAgents.indexOf('*') !== -1) {
         let allDisallowedRoutes = rulesObj['*'].disallow;
         allDisallowedRoutes.forEach((route) => {
-            if (desiredRoute.indexOf(route) === 0) {
+            if (desiredRoute === route.split('/')[1]) {
                 allowed = false;
             } else if (route === '/') {
                 allowed = false;

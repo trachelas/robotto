@@ -191,5 +191,39 @@ describe('robotto', () => {
             let permission = robotto.check('NotKnownSpy', 'http://secrets.com/crazy-route/whatever', rules);
             assert.strictEqual(permission, false);
         });
+
+        it('should not match partial disallowed urls for specified user-agent', () => {
+            let rules = {
+                comments: ['comment 1'],
+                '*': {
+                    allow: [],
+                    disallow: ['/love/']
+                },
+                '007': {
+                    allow: [],
+                    disallow: ['/spies/']
+                }
+            };
+
+            let permission = robotto.check('007', 'http://secrets.com/spi', rules);
+            assert.strictEqual(permission, true);
+        });
+
+        it('should not match partial disallowed urls for a non-specified user-agent', () => {
+            let rules = {
+                comments: ['comment 1'],
+                '*': {
+                    allow: [],
+                    disallow: ['/whatever/']
+                },
+                '007': {
+                    allow: [],
+                    disallow: ['/spies/']
+                }
+            };
+
+            let permission = robotto.check('NotKnownSpy', 'http://secrets.com/what', rules);
+            assert.strictEqual(permission, true);
+        });
     });
 });
