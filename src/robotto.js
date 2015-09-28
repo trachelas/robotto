@@ -83,6 +83,7 @@ robotto.parse = function(robotsFile) {
 };
 
 robotto.check = function(userAgent, urlParam, rulesObj) {
+    delete rulesObj.comments;
     let userAgents = Object.keys(rulesObj);
     let desiredRoute = (url.parse(urlParam).pathname + '/').split('/')[1];
     let allowed = true;
