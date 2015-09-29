@@ -5,11 +5,16 @@
   "homepage": "https://github.com/trachelas/robotto",
   "repository": "trachelas/robotto",
   "author": {
-    "name": "Lucas Fernandes da Costa",
-    "email": "fernandesdacostalucas@gmail.com",
-    "url": "http://lucasfcosta.com"
+    "name": "Trachelas Team",
+    "email": "trachelasteam@gmail.com",
+    "url": "http://github.com/trachelas"
   },
   "contributors": [
+    {
+      "name": "Lucas Fernandes da Costa",
+      "email": "fernandesdacostalucas@gmail.com",
+      "url": "http://lucasfcosta.com"
+    },
     {
       "name": "Lucas Vieira",
       "email": "vieiralucas4@gmail.com",

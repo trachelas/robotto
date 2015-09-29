@@ -24,7 +24,7 @@ robotto.fetch = function(urlP, callback) {
         }
 
         if (res.statusCode !== 200) {
-            callback(new Error(`Could not fetch robots.txt from ${urlP}, the server returned ${res.statusCode} code`));
+            callback(new Error(`Could not fetch robots.txt from ${urlP}. Server response code: ${res.statusCode}`));
             return;
         }
 
@@ -56,9 +56,9 @@ robotto.parse = function(robotsFile) {
             line = portions[0].trim(); // exclude comment from line
         }
 
-        let userAgentIndex = line.indexOf('User-agent:');
+        let userAgentIndex = line.toLowerCase().indexOf('user-agent:');
         if (userAgentIndex === 0) {
-            lastUserAgent = line.split('User-agent:')[1].trim();
+            lastUserAgent = line.split(':')[1].trim();
             rulesObj[lastUserAgent] = {
                 allow: [],
                 disallow: []
@@ -66,20 +66,77 @@ robotto.parse = function(robotsFile) {
             return;
         }
 
-        let allowIndex = line.indexOf('Allow:');
+        let allowIndex = line.toLowerCase().indexOf('allow:');
         if (allowIndex === 0) {
-            rulesObj[lastUserAgent].allow.push(line.split('Allow:')[1].trim());
+            rulesObj[lastUserAgent].allow.push(line.split(':')[1].trim());
             return;
         }
 
-        let disallowIndex = line.indexOf('Disallow:');
+        let disallowIndex = line.toLowerCase().indexOf('disallow:');
         if (disallowIndex === 0) {
-            rulesObj[lastUserAgent].disallow.push(line.split('Disallow:')[1].trim());
+            rulesObj[lastUserAgent].disallow.push(line.split(':')[1].trim());
             return;
         }
     });
 
     return rulesObj;
+};
+
+robotto.check = function(userAgent, urlParam, rulesObj) {
+    delete rulesObj.comments;
+    let userAgents = Object.keys(rulesObj);
+    let desiredRoute = (url.parse(urlParam).pathname + '/').split('/')[1];
+    let allowed = true;
+
+    // Searches for every user agent until it gets a match
+    // The 'return true' statements are used to break the .some() loop
+    userAgents.some((agent) => {
+        if (agent === userAgent) {
+            // Check if route is disallowed
+            let disallowedRoutes = rulesObj[agent].disallow;
+            disallowedRoutes.some((route) => {
+                if (desiredRoute === route.split('/')[1]) {
+                    allowed = false;
+                    return true;
+                  } else if (route === '/') {
+                    allowed = false;
+                    return true;
+                }
+            });
+            return true;
+        }
+    });
+
+    // Checks the general rules
+    if (userAgents.indexOf('*') !== -1) {
+        let allDisallowedRoutes = rulesObj['*'].disallow;
+        allDisallowedRoutes.some((route) => {
+            if (desiredRoute === route.split('/')[1]) {
+                allowed = false;
+                return true;
+            } else if (route === '/') {
+                allowed = false;
+                return true;
+            }
+        });
+    }
+
+    return allowed;
+};
+
+robotto.canCrawl = function(userAgent, urlParam, callback) {
+    callback = typeof callback === 'function' ? callback : new Function();
+
+    this.fetch(urlParam, (err, robotsTxt) => {
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        let rules = this.parse(robotsTxt);
+        let canCrawl = this.check(userAgent, urlParam, rules);
+        callback(null, canCrawl);
+    });
 };
 
 module.exports = robotto;

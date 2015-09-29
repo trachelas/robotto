@@ -66,7 +66,7 @@ describe('robotto', () => {
                 .callsArgWith(1, null, {statusCode: 404});
 
             robotto.fetch(coolUrl, (err) => {
-                assert.deepEqual(err.message, `Could not fetch robots.txt from ${coolUrl}, the server returned 404 code`);
+                assert.deepEqual(err.message, `Could not fetch robots.txt from ${coolUrl}. Server response code: 404`);
                 done();
             });
         });
@@ -81,7 +81,7 @@ describe('robotto', () => {
     });
 
     describe('parse', () => {
-        it('should undertand comments', () => {
+        it('should understand comments', () => {
             let robotsFile = [
                 '# comment 1',
                 'User-agent: 007 # comment 2'
@@ -134,6 +134,154 @@ describe('robotto', () => {
 
         it('should actually parse a robots.txt file', () => {
             assert.deepEqual(robotto.parse(fake.robots()), fake.rules());
+        });
+    });
+
+    describe('check', () => {
+        it('should find a disallowed route for a specified agent', () => {
+            let permission1 = robotto.check('007', 'http://secrets.com/admin/login', fake.rules());
+            let permission2 = robotto.check('007', 'http://secrets.com/admin', fake.rules());
+
+            assert.strictEqual(permission1, false);
+            assert.strictEqual(permission2, false);
+        });
+
+        it('should find an allowed route for a specified agent', () => {
+            let permission1 = robotto.check('007', 'http://secrets.com/blog-post/i-love-spies', fake.rules());
+            let permission2 = robotto.check('007', 'http://secrets.com/blog-post', fake.rules());
+
+            assert.strictEqual(permission1, true);
+            assert.strictEqual(permission2, true);
+        });
+
+        it('should find a disallowed route for a non-specified agent', () => {
+            let permission1 = robotto.check('NotKnownSpy', 'http://secrets.com/spies/daniel-craig', fake.rules());
+            let permission2 = robotto.check('NotKnownSpy', 'http://secrets.com/spies', fake.rules());
+
+            assert.strictEqual(permission1, false);
+            assert.strictEqual(permission2, false);
+        });
+
+        it('should know every route is disallowed for a specified user agent', () => {
+            let rules = {
+                comments: ['comment 1'],
+                '007': {
+                    allow: [],
+                    disallow: ['/']
+                }
+            };
+
+            let permission = robotto.check('007', 'http://secrets.com/crazy-route/whatever', rules);
+            assert.strictEqual(permission, false);
+        });
+
+        it('should know every route is disallowed for a non-specified user agent', () => {
+            let rules = {
+                comments: ['comment 1'],
+                '*': {
+                    allow: [],
+                    disallow: ['/']
+                },
+                '007': {
+                    allow: [],
+                    disallow: ['/spies/']
+                }
+            };
+
+            let permission = robotto.check('NotKnownSpy', 'http://secrets.com/crazy-route/whatever', rules);
+            assert.strictEqual(permission, false);
+        });
+
+        it('should not match partial disallowed urls for specified user-agent', () => {
+            let rules = {
+                comments: ['comment 1'],
+                '*': {
+                    allow: [],
+                    disallow: ['/love/']
+                },
+                '007': {
+                    allow: [],
+                    disallow: ['/spies/']
+                }
+            };
+
+            let permission = robotto.check('007', 'http://secrets.com/spi', rules);
+            assert.strictEqual(permission, true);
+        });
+
+        it('should not match partial disallowed urls for a non-specified user-agent', () => {
+            let rules = {
+                comments: ['comment 1'],
+                '*': {
+                    allow: [],
+                    disallow: ['/whatever/']
+                },
+                '007': {
+                    allow: [],
+                    disallow: ['/spies/']
+                }
+            };
+
+            let permission = robotto.check('NotKnownSpy', 'http://secrets.com/what', rules);
+            assert.strictEqual(permission, true);
+        });
+    });
+
+    describe('canCrawl', () => {
+        beforeEach(() => {
+            sandbox.stub(robotto, 'fetch')
+                .callsArgWith(1, null, fake.robots());
+            sandbox.stub(robotto, 'parse').returns(fake.rules());
+            sandbox.stub(robotto, 'check').returns(true);
+
+            sandbox.stub(robotto, '_request')
+                .callsArgWith(1, null, fake.response(), fake.robots());
+        });
+
+        it('should not break if no callback is passed', () => {
+            assert.doesNotThrow(() => {
+                robotto.canCrawl('007', coolUrl);
+            }, 'callback is not a function');
+        });
+
+        it('should call fetch', (done) => {
+            robotto.canCrawl('007', coolUrl, () => {
+                sinon.assert.calledWith(robotto.fetch, coolUrl);
+                done();
+            });
+        });
+
+        it('should callback with an error if fetch fails', (done) => {
+            robotto.fetch.restore();
+            sandbox.stub(robotto, 'fetch')
+                .callsArgWith(1, new Error('fake fetch error'));
+
+            robotto.canCrawl('007', coolUrl, (err) => {
+                assert.deepEqual(err.message, 'fake fetch error');
+                done();
+            });
+        });
+
+        it('should call parse', (done) => {
+            robotto.canCrawl('007', coolUrl, () => {
+                sinon.assert.calledWith(robotto.parse, fake.robots());
+                done();
+            });
+        });
+
+        it('should call check', (done) => {
+            robotto.canCrawl('007', coolUrl, () => {
+                sinon.assert.calledWith(robotto.check, '007', coolUrl, fake.rules());
+                done();
+            });
+        });
+
+        it('should call final callback', (done) => {
+            robotto.canCrawl('007', coolUrl, (err, permission) => {
+                assert.isNull(err);
+                assert.isTrue(permission);
+                done();
+            });
         });
     });
 });
