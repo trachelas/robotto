@@ -15,16 +15,16 @@ describe('robotto', () => {
         sandbox.restore();
     });
 
-    describe('_getRobotsUrl', () => {
+    describe('getRobotsUrl', () => {
         it('returns robots.txt url for given host', () => {
-            let robotsUrl = robotto._getRobotsUrl(coolUrl);
+            let robotsUrl = robotto.getRobotsUrl(coolUrl);
             assert.deepEqual(robotsUrl, coolRobot);
         });
     });
 
     describe('fetch', () => {
         beforeEach(() => {
-            sandbox.spy(robotto, '_getRobotsUrl');
+            sandbox.spy(robotto, 'getRobotsUrl');
             sandbox.stub(robotto, '_request')
                 .callsArgWith(1, null, fake.response(), fake.robots());
         });
@@ -35,9 +35,9 @@ describe('robotto', () => {
             }, 'callback is not a function');
         });
 
-        it('should call _getRobotsUrl', (done) => {
+        it('should call getRobotsUrl', (done) => {
             robotto.fetch(coolUrl, () => {
-                sinon.assert.calledWith(robotto._getRobotsUrl, coolUrl);
+                sinon.assert.calledWith(robotto.getRobotsUrl, coolUrl);
                 done();
             });
         });
