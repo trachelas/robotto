@@ -3,6 +3,7 @@
 
 const assert = require('chai').assert;
 const sinon = require('sinon');
+const request = require('request');
 const robotto = require('../src/robotto');
 const fake = require('./fake');
 
@@ -15,17 +16,17 @@ describe('robotto', () => {
         sandbox.restore();
     });
 
-    describe('_getRobotsUrl', () => {
+    describe('getRobotsUrl', () => {
         it('returns robots.txt url for given host', () => {
-            let robotsUrl = robotto._getRobotsUrl(coolUrl);
+            let robotsUrl = robotto.getRobotsUrl(coolUrl);
             assert.deepEqual(robotsUrl, coolRobot);
         });
     });
 
     describe('fetch', () => {
         beforeEach(() => {
-            sandbox.spy(robotto, '_getRobotsUrl');
-            sandbox.stub(robotto, '_request')
+            sandbox.spy(robotto, 'getRobotsUrl');
+            sandbox.stub(request, 'get')
                 .callsArgWith(1, null, fake.response(), fake.robots());
         });
 
@@ -35,23 +36,23 @@ describe('robotto', () => {
             }, 'callback is not a function');
         });
 
-        it('should call _getRobotsUrl', (done) => {
+        it('should call getRobotsUrl', (done) => {
             robotto.fetch(coolUrl, () => {
-                sinon.assert.calledWith(robotto._getRobotsUrl, coolUrl);
+                sinon.assert.calledWith(robotto.getRobotsUrl, coolUrl);
                 done();
             });
         });
 
-        it('should call _request', (done) => {
+        it('should call request.get', (done) => {
             robotto.fetch(coolUrl, () => {
-                sinon.assert.calledWith(robotto._request, coolRobot);
+                sinon.assert.calledWith(request.get, coolRobot);
                 done();
             });
         });
 
         it('should callback with an error if request fails', (done) => {
-            robotto._request.restore();
-            sandbox.stub(robotto, '_request')
+            request.get.restore();
+            sandbox.stub(request, 'get')
                 .callsArgWith(1, new Error('fake request error'));
 
             robotto.fetch(coolUrl, (err) => {
@@ -61,8 +62,8 @@ describe('robotto', () => {
         });
 
         it('should callback with an error if status code is not 200', (done) => {
-            robotto._request.restore();
-            sandbox.stub(robotto, '_request')
+            request.get.restore();
+            sandbox.stub(request, 'get')
                 .callsArgWith(1, null, {statusCode: 404});
 
             robotto.fetch(coolUrl, (err) => {
@@ -100,8 +101,8 @@ describe('robotto', () => {
                 'Disallow: /nothing/'
             ].join('\n');
 
-            assert.property(robotto.parse(robotsFile), '007');
-            assert.property(robotto.parse(robotsFile), 'Agent 47');
+            assert.property(robotto.parse(robotsFile).userAgents, '007');
+            assert.property(robotto.parse(robotsFile).userAgents, 'Agent 47');
         });
 
         it('should put allow entries in their respective User-agents', () => {
@@ -114,8 +115,8 @@ describe('robotto', () => {
             ].join('\n');
             let rules = robotto.parse(robotsFile);
 
-            assert.deepEqual(rules['007'].allow, ['/kill/']);
-            assert.deepEqual(rules['Agent 47'].allow, ['/everything/']);
+            assert.deepEqual(rules.userAgents['007'].allow, ['/kill/']);
+            assert.deepEqual(rules.userAgents['Agent 47'].allow, ['/everything/']);
         });
 
         it('should put disallow entries in their respective User-agents', () => {
@@ -128,8 +129,8 @@ describe('robotto', () => {
             ].join('\n');
             let rules = robotto.parse(robotsFile);
 
-            assert.deepEqual(rules['007'].disallow, ['/betrayal/']);
-            assert.deepEqual(rules['Agent 47'].disallow, ['/nothing/']);
+            assert.deepEqual(rules.userAgents['007'].disallow, ['/betrayal/']);
+            assert.deepEqual(rules.userAgents['Agent 47'].disallow, ['/nothing/']);
         });
 
         it('should actually parse a robots.txt file', () => {
@@ -165,9 +166,11 @@ describe('robotto', () => {
         it('should know every route is disallowed for a specified user agent', () => {
             let rules = {
                 comments: ['comment 1'],
-                '007': {
-                    allow: [],
-                    disallow: ['/']
+                userAgents: {
+                    '007': {
+                        allow: [],
+                        disallow: ['/']
+                    }
                 }
             };
 
@@ -178,13 +181,15 @@ describe('robotto', () => {
         it('should know every route is disallowed for a non-specified user agent', () => {
             let rules = {
                 comments: ['comment 1'],
-                '*': {
-                    allow: [],
-                    disallow: ['/']
-                },
-                '007': {
-                    allow: [],
-                    disallow: ['/spies/']
+                userAgents: {
+                    '*': {
+                        allow: [],
+                        disallow: ['/']
+                    },
+                    '007': {
+                        allow: [],
+                        disallow: ['/spies/']
+                    }
                 }
             };
 
@@ -195,13 +200,15 @@ describe('robotto', () => {
         it('should not match partial disallowed urls for specified user-agent', () => {
             let rules = {
                 comments: ['comment 1'],
-                '*': {
-                    allow: [],
-                    disallow: ['/love/']
-                },
-                '007': {
-                    allow: [],
-                    disallow: ['/spies/']
+                userAgents: {
+                    '*': {
+                        allow: [],
+                        disallow: ['/love/']
+                    },
+                    '007': {
+                        allow: [],
+                        disallow: ['/spies/']
+                    }
                 }
             };
 
@@ -212,13 +219,15 @@ describe('robotto', () => {
         it('should not match partial disallowed urls for a non-specified user-agent', () => {
             let rules = {
                 comments: ['comment 1'],
-                '*': {
-                    allow: [],
-                    disallow: ['/whatever/']
-                },
-                '007': {
-                    allow: [],
-                    disallow: ['/spies/']
+                userAgents: {
+                    '*': {
+                        allow: [],
+                        disallow: ['/whatever/']
+                    },
+                    '007': {
+                        allow: [],
+                        disallow: ['/spies/']
+                    }
                 }
             };
 
@@ -233,9 +242,6 @@ describe('robotto', () => {
                 .callsArgWith(1, null, fake.robots());
             sandbox.stub(robotto, 'parse').returns(fake.rules());
             sandbox.stub(robotto, 'check').returns(true);
-
-            sandbox.stub(robotto, '_request')
-                .callsArgWith(1, null, fake.response(), fake.robots());
         });
 
         it('should not break if no callback is passed', () => {
