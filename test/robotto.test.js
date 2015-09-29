@@ -136,4 +136,94 @@ describe('robotto', () => {
             assert.deepEqual(robotto.parse(fake.robots()), fake.rules());
         });
     });
+
+    describe('check', () => {
+        it('should find a disallowed route for a specified agent', () => {
+            let permission1 = robotto.check('007', 'http://secrets.com/admin/login', fake.rules());
+            let permission2 = robotto.check('007', 'http://secrets.com/admin', fake.rules());
+
+            assert.strictEqual(permission1, false);
+            assert.strictEqual(permission2, false);
+        });
+
+        it('should find an allowed route for a specified agent', () => {
+            let permission1 = robotto.check('007', 'http://secrets.com/blog-post/i-love-spies', fake.rules());
+            let permission2 = robotto.check('007', 'http://secrets.com/blog-post', fake.rules());
+
+            assert.strictEqual(permission1, true);
+            assert.strictEqual(permission2, true);
+        });
+
+        it('should find a disallowed route for a non-specified agent', () => {
+            let permission1 = robotto.check('NotKnownSpy', 'http://secrets.com/spies/daniel-craig', fake.rules());
+            let permission2 = robotto.check('NotKnownSpy', 'http://secrets.com/spies', fake.rules());
+
+            assert.strictEqual(permission1, false);
+            assert.strictEqual(permission2, false);
+        });
+
+        it('should know every route is disallowed for a specified user agent', () => {
+            let rules = {
+                comments: ['comment 1'],
+                '007': {
+                    allow: [],
+                    disallow: ['/']
+                }
+            };
+
+            let permission = robotto.check('007', 'http://secrets.com/crazy-route/whatever', rules);
+            assert.strictEqual(permission, false);
+        });
+
+        it('should know every route is disallowed for a non-specified user agent', () => {
+            let rules = {
+                comments: ['comment 1'],
+                '*': {
+                    allow: [],
+                    disallow: ['/']
+                },
+                '007': {
+                    allow: [],
+                    disallow: ['/spies/']
+                }
+            };
+
+            let permission = robotto.check('NotKnownSpy', 'http://secrets.com/crazy-route/whatever', rules);
+            assert.strictEqual(permission, false);
+        });
+
+        it('should not match partial disallowed urls for specified user-agent', () => {
+            let rules = {
+                comments: ['comment 1'],
+                '*': {
+                    allow: [],
+                    disallow: ['/love/']
+                },
+                '007': {
+                    allow: [],
+                    disallow: ['/spies/']
+                }
+            };
+
+            let permission = robotto.check('007', 'http://secrets.com/spi', rules);
+            assert.strictEqual(permission, true);
+        });
+
+        it('should not match partial disallowed urls for a non-specified user-agent', () => {
+            let rules = {
+                comments: ['comment 1'],
+                '*': {
+                    allow: [],
+                    disallow: ['/whatever/']
+                },
+                '007': {
+                    allow: [],
+                    disallow: ['/spies/']
+                }
+            };
+
+            let permission = robotto.check('NotKnownSpy', 'http://secrets.com/what', rules);
+            assert.strictEqual(permission, true);
+        });
+    });
 });
