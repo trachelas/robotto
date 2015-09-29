@@ -16,7 +16,7 @@ gulp.task('nsp', (cb) => {
 });
 
 gulp.task('pre-test', () => {
-    return gulp.src('src\**\*.js')
+    return gulp.src('src/**/*.js')
         .pipe(istanbul({
             includeUntested: true
         }))
