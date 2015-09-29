@@ -10,14 +10,12 @@ robotto.getRobotsUrl = function(urlP) {
     return `${receivedUrl.protocol}\/\/${receivedUrl.host}/robots.txt`;
 };
 
-robotto._request = request;
-
 robotto.fetch = function(urlP, callback) {
     callback = typeof callback === 'function' ? callback : new Function();
 
     let robotsUrl = robotto.getRobotsUrl(urlP);
 
-    robotto._request(robotsUrl, (err, res, body) => {
+    request.get(robotsUrl, (err, res, body) => {
         if (err) {
             callback(err);
             return;

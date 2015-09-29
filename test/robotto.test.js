@@ -3,6 +3,7 @@
 
 const assert = require('chai').assert;
 const sinon = require('sinon');
+const request = require('request');
 const robotto = require('../src/robotto');
 const fake = require('./fake');
 
@@ -25,7 +26,7 @@ describe('robotto', () => {
     describe('fetch', () => {
         beforeEach(() => {
             sandbox.spy(robotto, 'getRobotsUrl');
-            sandbox.stub(robotto, '_request')
+            sandbox.stub(request, 'get')
                 .callsArgWith(1, null, fake.response(), fake.robots());
         });
 
@@ -42,16 +43,16 @@ describe('robotto', () => {
             });
         });
 
-        it('should call _request', (done) => {
+        it('should call request.get', (done) => {
             robotto.fetch(coolUrl, () => {
-                sinon.assert.calledWith(robotto._request, coolRobot);
+                sinon.assert.calledWith(request.get, coolRobot);
                 done();
             });
         });
 
         it('should callback with an error if request fails', (done) => {
-            robotto._request.restore();
-            sandbox.stub(robotto, '_request')
+            request.get.restore();
+            sandbox.stub(request, 'get')
                 .callsArgWith(1, new Error('fake request error'));
 
             robotto.fetch(coolUrl, (err) => {
@@ -61,8 +62,8 @@ describe('robotto', () => {
         });
 
         it('should callback with an error if status code is not 200', (done) => {
-            robotto._request.restore();
-            sandbox.stub(robotto, '_request')
+            request.get.restore();
+            sandbox.stub(request, 'get')
                 .callsArgWith(1, null, {statusCode: 404});
 
             robotto.fetch(coolUrl, (err) => {
@@ -241,9 +242,6 @@ describe('robotto', () => {
                 .callsArgWith(1, null, fake.robots());
             sandbox.stub(robotto, 'parse').returns(fake.rules());
             sandbox.stub(robotto, 'check').returns(true);
-
-            sandbox.stub(robotto, '_request')
-                .callsArgWith(1, null, fake.response(), fake.robots());
         });
 
         it('should not break if no callback is passed', () => {
