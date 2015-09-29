@@ -226,4 +226,62 @@ describe('robotto', () => {
             assert.strictEqual(permission, true);
         });
     });
+
+    describe('canCrawl', () => {
+        beforeEach(() => {
+            sandbox.stub(robotto, 'fetch')
+                .callsArgWith(1, null, fake.robots());
+            sandbox.stub(robotto, 'parse').returns(fake.rules());
+            sandbox.stub(robotto, 'check').returns(true);
+
+            sandbox.stub(robotto, '_request')
+                .callsArgWith(1, null, fake.response(), fake.robots());
+        });
+
+        it('should not break if no callback is passed', () => {
+            assert.doesNotThrow(() => {
+                robotto.canCrawl('007', coolUrl);
+            }, 'callback is not a function');
+        });
+
+        it('should call fetch', (done) => {
+            robotto.canCrawl('007', coolUrl, () => {
+                sinon.assert.calledWith(robotto.fetch, coolUrl);
+                done();
+            });
+        });
+
+        it('should callback with an error if fetch fails', (done) => {
+            robotto.fetch.restore();
+            sandbox.stub(robotto, 'fetch')
+                .callsArgWith(1, new Error('fake fetch error'));
+
+            robotto.canCrawl('007', coolUrl, (err) => {
+                assert.deepEqual(err.message, 'fake fetch error');
+                done();
+            });
+        });
+
+        it('should call parse', (done) => {
+            robotto.canCrawl('007', coolUrl, () => {
+                sinon.assert.calledWith(robotto.parse, fake.robots());
+                done();
+            });
+        });
+
+        it('should call check', (done) => {
+            robotto.canCrawl('007', coolUrl, () => {
+                sinon.assert.calledWith(robotto.check, '007', coolUrl, fake.rules());
+                done();
+            });
+        });
+
+        it('should call final callback', (done) => {
+            robotto.canCrawl('007', coolUrl, (err, permission) => {
+                assert.isNull(err);
+                assert.isTrue(permission);
+                done();
+            });
+        });
+    });
 });
