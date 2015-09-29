@@ -1,4 +1,4 @@
-![Build Status](https://travis-ci.org/trachelas/robotto.svg)
+![Build Status](https://travis-ci.org/trachelas/robotto.svg) [![Coverage Status](https://coveralls.io/repos/trachelas/robotto/badge.svg?branch=master&service=github)](https://coveralls.io/github/trachelas/robotto?branch=master)
 
 # robotto
 Easily read, parse and check permissions on robots.txt files!
