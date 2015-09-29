@@ -100,8 +100,8 @@ describe('robotto', () => {
                 'Disallow: /nothing/'
             ].join('\n');
 
-            assert.property(robotto.parse(robotsFile), '007');
-            assert.property(robotto.parse(robotsFile), 'Agent 47');
+            assert.property(robotto.parse(robotsFile).userAgents, '007');
+            assert.property(robotto.parse(robotsFile).userAgents, 'Agent 47');
         });
 
         it('should put allow entries in their respective User-agents', () => {
@@ -114,8 +114,8 @@ describe('robotto', () => {
             ].join('\n');
             let rules = robotto.parse(robotsFile);
 
-            assert.deepEqual(rules['007'].allow, ['/kill/']);
-            assert.deepEqual(rules['Agent 47'].allow, ['/everything/']);
+            assert.deepEqual(rules.userAgents['007'].allow, ['/kill/']);
+            assert.deepEqual(rules.userAgents['Agent 47'].allow, ['/everything/']);
         });
 
         it('should put disallow entries in their respective User-agents', () => {
@@ -128,8 +128,8 @@ describe('robotto', () => {
             ].join('\n');
             let rules = robotto.parse(robotsFile);
 
-            assert.deepEqual(rules['007'].disallow, ['/betrayal/']);
-            assert.deepEqual(rules['Agent 47'].disallow, ['/nothing/']);
+            assert.deepEqual(rules.userAgents['007'].disallow, ['/betrayal/']);
+            assert.deepEqual(rules.userAgents['Agent 47'].disallow, ['/nothing/']);
         });
 
         it('should actually parse a robots.txt file', () => {
@@ -165,9 +165,11 @@ describe('robotto', () => {
         it('should know every route is disallowed for a specified user agent', () => {
             let rules = {
                 comments: ['comment 1'],
-                '007': {
-                    allow: [],
-                    disallow: ['/']
+                userAgents: {
+                    '007': {
+                        allow: [],
+                        disallow: ['/']
+                    }
                 }
             };
 
@@ -178,13 +180,15 @@ describe('robotto', () => {
         it('should know every route is disallowed for a non-specified user agent', () => {
             let rules = {
                 comments: ['comment 1'],
-                '*': {
-                    allow: [],
-                    disallow: ['/']
-                },
-                '007': {
-                    allow: [],
-                    disallow: ['/spies/']
+                userAgents: {
+                    '*': {
+                        allow: [],
+                        disallow: ['/']
+                    },
+                    '007': {
+                        allow: [],
+                        disallow: ['/spies/']
+                    }
                 }
             };
 
@@ -195,13 +199,15 @@ describe('robotto', () => {
         it('should not match partial disallowed urls for specified user-agent', () => {
             let rules = {
                 comments: ['comment 1'],
-                '*': {
-                    allow: [],
-                    disallow: ['/love/']
-                },
-                '007': {
-                    allow: [],
-                    disallow: ['/spies/']
+                userAgents: {
+                    '*': {
+                        allow: [],
+                        disallow: ['/love/']
+                    },
+                    '007': {
+                        allow: [],
+                        disallow: ['/spies/']
+                    }
                 }
             };
 
@@ -212,13 +218,15 @@ describe('robotto', () => {
         it('should not match partial disallowed urls for a non-specified user-agent', () => {
             let rules = {
                 comments: ['comment 1'],
-                '*': {
-                    allow: [],
-                    disallow: ['/whatever/']
-                },
-                '007': {
-                    allow: [],
-                    disallow: ['/spies/']
+                userAgents: {
+                    '*': {
+                        allow: [],
+                        disallow: ['/whatever/']
+                    },
+                    '007': {
+                        allow: [],
+                        disallow: ['/spies/']
+                    }
                 }
             };
 

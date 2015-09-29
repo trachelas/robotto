@@ -35,6 +35,7 @@ robotto.fetch = function(urlP, callback) {
 robotto.parse = function(robotsFile) {
     let lines = robotsFile.split('\n');
     let rulesObj = {
+        userAgents: {},
         comments: []
     };
     let lastUserAgent;
@@ -59,7 +60,7 @@ robotto.parse = function(robotsFile) {
         let userAgentIndex = line.toLowerCase().indexOf('user-agent:');
         if (userAgentIndex === 0) {
             lastUserAgent = line.split(':')[1].trim();
-            rulesObj[lastUserAgent] = {
+            rulesObj.userAgents[lastUserAgent] = {
                 allow: [],
                 disallow: []
             };
@@ -68,13 +69,13 @@ robotto.parse = function(robotsFile) {
 
         let allowIndex = line.toLowerCase().indexOf('allow:');
         if (allowIndex === 0) {
-            rulesObj[lastUserAgent].allow.push(line.split(':')[1].trim());
+            rulesObj.userAgents[lastUserAgent].allow.push(line.split(':')[1].trim());
             return;
         }
 
         let disallowIndex = line.toLowerCase().indexOf('disallow:');
         if (disallowIndex === 0) {
-            rulesObj[lastUserAgent].disallow.push(line.split(':')[1].trim());
+            rulesObj.userAgents[lastUserAgent].disallow.push(line.split(':')[1].trim());
             return;
         }
     });
@@ -83,8 +84,8 @@ robotto.parse = function(robotsFile) {
 };
 
 robotto.check = function(userAgent, urlParam, rulesObj) {
-    delete rulesObj.comments;
-    let userAgents = Object.keys(rulesObj);
+    let userAgents = Object.keys(rulesObj.userAgents);
+    let rules = rulesObj.userAgents;
     let desiredRoute = (url.parse(urlParam).pathname + '/').split('/')[1];
     let allowed = true;
 
@@ -93,7 +94,7 @@ robotto.check = function(userAgent, urlParam, rulesObj) {
     userAgents.some((agent) => {
         if (agent === userAgent) {
             // Check if route is disallowed
-            let disallowedRoutes = rulesObj[agent].disallow;
+            let disallowedRoutes = rules[agent].disallow;
             disallowedRoutes.some((route) => {
                 if (desiredRoute === route.split('/')[1]) {
                     allowed = false;
@@ -109,7 +110,7 @@ robotto.check = function(userAgent, urlParam, rulesObj) {
 
     // Checks the general rules
     if (userAgents.indexOf('*') !== -1) {
-        let allDisallowedRoutes = rulesObj['*'].disallow;
+        let allDisallowedRoutes = rules['*'].disallow;
         allDisallowedRoutes.some((route) => {
             if (desiredRoute === route.split('/')[1]) {
                 allowed = false;
