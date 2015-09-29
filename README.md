@@ -1,3 +1,5 @@
+![Build Status](https://travis-ci.org/trachelas/robotto.svg)
+
 # robotto
 Easily read, parse and check permissions on robots.txt files!
 
