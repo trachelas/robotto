@@ -174,8 +174,8 @@ Robotto is proudly brought to you by the [Trachelas Team](https://github.com/tra
 
 | Name               | Github        | Twitter       |
 | ------------------ | ------------- | ------------- |
-| Lucas F. da Costa  | @lucasfcosta(https://github.com/lucasfcosta)  | [@lfernandescosta](https://twitter.com/lfernandescosta) |
-| Lucas Vieira       | @vieiralucas(https://github.com/vieiralucas)  | |
+| [**Lucas F. da Costa**](http://lucasfcosta.com) | [github.com/lucasfcosta](https://github.com/lucasfcosta) | [@lfernandescosta](https://twitter.com/lfernandescosta) |
+| **Lucas Vieira** | [github.com/vieiralucas](https://github.com/vieiralucas) | |
 
 
 ## License
