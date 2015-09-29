@@ -24,13 +24,15 @@ fake.robots = function() {
 fake.rules = function() {
     return {
         comments: ['comment 1', 'comment 2'],
-        '*': {
-            allow: ['/love/'],
-            disallow: ['/spies/']
-        },
-        '007': {
-            allow: ['/blog-post/'],
-            disallow: ['/admin/']
+        userAgents: {
+            '*': {
+                allow: ['/love/'],
+                disallow: ['/spies/']
+            },
+            '007': {
+                allow: ['/blog-post/'],
+                disallow: ['/admin/']
+            }
         }
     };
 };
