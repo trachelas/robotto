@@ -81,6 +81,66 @@ robotto.parse = function(robotsFile) {
     return rulesObj;
 };
 
+robotto.getAllowDeepness = function(userAgent, urlParam, rulesObj) {
+    let agentList = Object.keys(rulesObj.userAgents);
+    let rules = rulesObj.userAgents;
+    let routes = (url.parse(urlParam).pathname + '/').split('/');
+    let permission = 0;
+
+    // Clears empty values after splitting routes
+    routes = routes.filter(Boolean);
+
+    // Checks rules for specified user agents
+    if (agentList.indexOf(userAgent) !== -1) {
+        let userAgentRules = rulesObj.userAgents[userAgent].allow;
+
+        userAgentRules.forEach((route) => {
+            let registeredSubPaths = route.split('/').filter(Boolean);
+            let i = 0;
+
+            // For each path match adds 1 to i
+            routes.some((subPath) => {
+                if (subPath === registeredSubPaths[i]) {
+                    i++;
+                } else {
+                    // If full path does not match it has no permissions
+                    i = 0;
+                    return true;
+                }
+            });
+
+            // If it's the deepest match until now replaces permission
+            if (i > permission) {
+                permission = i;
+            }
+        });
+    }
+
+    // Checks generic rules
+    if (agentList.indexOf('*') !== -1) {
+        let userAgentRules = rulesObj.userAgents['*'].allow;
+
+        userAgentRules.forEach((route) => {
+            let registeredSubPaths = route.split('/').filter(Boolean);
+            let i = 0;
+            routes.some((subPath) => {
+                if (subPath === registeredSubPaths[i]) {
+                    i++;
+                } else {
+                    i = 0;
+                    return true;
+                }
+            });
+
+            if (i > permission) {
+                permission = i;
+            }
+        });
+    }
+
+    return permission;
+};
+
 robotto.check = function(userAgent, urlParam, rulesObj) {
     let userAgents = Object.keys(rulesObj.userAgents);
     let rules = rulesObj.userAgents;
