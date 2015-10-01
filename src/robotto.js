@@ -71,11 +71,8 @@ robotto.parse = function(robotsFile) {
             return;
         }
 
-        let disallowIndex = line.toLowerCase().indexOf('disallow:');
-        if (disallowIndex === 0) {
-            rulesObj.userAgents[lastUserAgent].disallow.push(line.split(':')[1].trim());
-            return;
-        }
+        rulesObj.userAgents[lastUserAgent].disallow.push(line.split(':')[1].trim());
+        return;
     });
 
     return rulesObj;
