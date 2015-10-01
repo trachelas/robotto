@@ -133,6 +133,38 @@ describe('robotto', () => {
             assert.deepEqual(rules.userAgents['Agent 47'].disallow, ['/nothing/']);
         });
 
+        it('should ignore unrecognized rules', () => {
+            let robotsFile = [
+                '# comment 1',
+                'User-agent: 007 # comment 2',
+                'Allow: /nice-cars/',
+                'Disallow: /betrayal/',
+                'Unknown: /unknown/',
+                'User-agent: Agent 47',
+                'Allow: /nice-games/',
+                'Disallow: /nothing/',
+                'Unknown: /unknown/'
+            ].join('\n');
+
+            let correctRulesObject = {
+                comments: ['comment 1', 'comment 2'],
+                userAgents: {
+                    '007': {
+                        allow: ['/nice-cars/'],
+                        disallow: ['/betrayal/']
+                    },
+                    'Agent 47': {
+                        allow: ['/nice-games/'],
+                        disallow: ['/nothing/']
+                    }
+                }
+            };
+
+            let rules = robotto.parse(robotsFile);
+
+            assert.deepEqual(rules, correctRulesObject);
+        });
+
         it('should actually parse a robots.txt file', () => {
             assert.deepEqual(robotto.parse(fake.robots()), fake.rules());
         });

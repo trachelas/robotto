@@ -71,8 +71,11 @@ robotto.parse = function(robotsFile) {
             return;
         }
 
-        rulesObj.userAgents[lastUserAgent].disallow.push(line.split(':')[1].trim());
-        return;
+        let disallowIndex = line.toLowerCase().indexOf('disallow:');
+        if (disallowIndex === 0) {
+            rulesObj.userAgents[lastUserAgent].disallow.push(line.split(':')[1].trim());
+            return;
+        }
     });
 
     return rulesObj;
@@ -94,7 +97,7 @@ robotto.check = function(userAgent, urlParam, rulesObj) {
                 if (desiredRoute === route.split('/')[1]) {
                     allowed = false;
                     return true;
-                  } else if (route === '/') {
+                } else if (route === '/') {
                     allowed = false;
                     return true;
                 }
