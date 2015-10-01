@@ -346,42 +346,40 @@ describe('robotto', () => {
         });
     });
 
-        it('should not match partial disallowed urls for specified user-agent', () => {
-            let rules = {
-                comments: ['comment 1'],
-                userAgents: {
-                    '*': {
-                        allow: [],
-                        disallow: ['/love/']
-                    },
-                    '007': {
-                        allow: [],
-                        disallow: ['/spies/']
-                    }
-                }
-            };
+    describe('check', () => {
 
-            let permission = robotto.check('007', 'http://secrets.com/spi', rules);
-            assert.strictEqual(permission, true);
+        it('should find an allowed route', () => {
+            let getRuleDeepnessFunc = sandbox.stub(robotto, 'getRuleDeepness', (rule) => {
+                return (rule === 'allow') ? 1 : 0;
+            });
+
+            let permission1 = robotto.check('007', 'http://secrets.com/blog-post/nice-car', fake.rules());
+            assert.strictEqual(permission1, true);
+
+            let permission2 = robotto.check('007', 'http://secrets.com/blog-post', fake.rules());
+            assert.strictEqual(permission2, true);
         });
 
-        it('should not match partial disallowed urls for a non-specified user-agent', () => {
-            let rules = {
-                comments: ['comment 1'],
-                userAgents: {
-                    '*': {
-                        allow: [],
-                        disallow: ['/whatever/']
-                    },
-                    '007': {
-                        allow: [],
-                        disallow: ['/spies/']
-                    }
-                }
-            };
+        it('should find a disallowed route', () => {
+            sandbox.stub(robotto, 'getRuleDeepness', (rule) => {
+                return (rule === 'disallow') ? 1 : 0;
+            });
 
-            let permission = robotto.check('NotKnownSpy', 'http://secrets.com/what', rules);
-            assert.strictEqual(permission, true);
+            let permission1 = robotto.check('007', 'http://secrets.com/admin/login', fake.rules());
+            let permission2 = robotto.check('007', 'http://secrets.com/admin', fake.rules());
+
+            assert.strictEqual(permission1, false);
+            assert.strictEqual(permission2, false);
+        });
+
+        it('should call getRuleDeepness for times for each call', () => {
+            let getRuleDeepnessFunc = sinon.spy(robotto, 'getRuleDeepness');
+
+            let permission1 = robotto.check('007', 'http://secrets.com/admin/login', fake.rules());
+            assert.strictEqual(getRuleDeepnessFunc.callCount, 4);
+
+            let permission2 = robotto.check('007', 'http://secrets.com/admin', fake.rules());
+            assert.strictEqual(getRuleDeepnessFunc.callCount, 8);
         });
     });
 
