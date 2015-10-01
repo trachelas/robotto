@@ -170,8 +170,101 @@ describe('robotto', () => {
         });
     });
 
+    describe('getAllowDeepness', () => {
+        it('should return the correct deepness for a specified route', () => {
+            let rules = {
+                comments: ['comment 1'],
+                userAgents: {
+                    '007': {
+                        allow: [],
+                        disallow: ['/']
+                    },
+                    '*': {
+                        allow: ['/first/second/'],
+                        disallow: ['/']
+                    }
+                }
+            };
+
+            let permission = robotto.getAllowDeepness('UnknownAgent', '/first/second/', rules);
+            assert.strictEqual(permission, 2);
+        });
+
+        it('should return the correct deepness for a specified route and user-agent', () => {
+            let rules = {
+                comments: ['comment 1'],
+                userAgents: {
+                    '007': {
+                        allow: ['/one/two/three/'],
+                        disallow: ['/']
+                    },
+                    '*': {
+                        allow: ['/first/second/'],
+                        disallow: ['/']
+                    }
+                }
+            };
+
+            let permission = robotto.getAllowDeepness('007', '/one/two/three/', rules);
+            assert.strictEqual(permission, 3);
+        });
+
+        it('should return 0 for a non-specified route', () => {
+            let rules = {
+                comments: ['comment 1'],
+                userAgents: {
+                    '007': {
+                        allow: ['/one/two/three/'],
+                        disallow: ['/']
+                    },
+                    '*': {
+                        allow: ['/first/second/'],
+                        disallow: ['/']
+                    }
+                }
+            };
+
+            let permission = robotto.getAllowDeepness('007', '/does/not/exist/', rules);
+            assert.strictEqual(permission, 0);
+        });
+
+        it('should return 0 for an incomplete match using a specified user-agent', () => {
+            let rules = {
+                comments: ['comment 1'],
+                userAgents: {
+                    '007': {
+                        allow: ['/one/two/three/'],
+                        disallow: ['/']
+                    },
+                    '*': {
+                        allow: ['/first/second/'],
+                        disallow: ['/']
+                    }
+                }
+            };
+
+            let permission = robotto.getAllowDeepness('007', '/one/two/four/', rules);
+            assert.strictEqual(permission, 0);
+        });
+
+        it('should return 0 when using unknown user-agent and there are no general rules', () => {
+            let rules = {
+                comments: ['comment 1'],
+                userAgents: {
+                    '007': {
+                        allow: ['/one/two/three/'],
+                        disallow: ['/']
+                    }
+                }
+            };
+
+            let permission = robotto.getAllowDeepness('UnknownAgent', '/one/two/three/', rules);
+            assert.strictEqual(permission, 0);
+        });
+    });
+
     describe('check', () => {
-        it('should find a disallowed route for a specified agent', () => {
+        it('should find a dgetAllowDeepness route for a specified agent', () => {
             let permission1 = robotto.check('007', 'http://secrets.com/admin/login', fake.rules());
             let permission2 = robotto.check('007', 'http://secrets.com/admin', fake.rules());
 
@@ -187,7 +280,7 @@ describe('robotto', () => {
             assert.strictEqual(permission2, true);
         });
 
-        it('should find a disallowed route for a non-specified agent', () => {
+        it('should find a dgetAllowDeepness route for a non-specified agent', () => {
             let permission1 = robotto.check('NotKnownSpy', 'http://secrets.com/spies/daniel-craig', fake.rules());
             let permission2 = robotto.check('NotKnownSpy', 'http://secrets.com/spies', fake.rules());
 
@@ -195,7 +288,7 @@ describe('robotto', () => {
             assert.strictEqual(permission2, false);
         });
 
-        it('should know every route is disallowed for a specified user agent', () => {
+        it('should know every route is dgetAllowDeepness for a specified user agent', () => {
             let rules = {
                 comments: ['comment 1'],
                 userAgents: {
@@ -210,7 +303,7 @@ describe('robotto', () => {
             assert.strictEqual(permission, false);
         });
 
-        it('should know every route is disallowed for a non-specified user agent', () => {
+        it('should know every route is dgetAllowDeepness for a non-specified user agent', () => {
             let rules = {
                 comments: ['comment 1'],
                 userAgents: {
@@ -229,7 +322,7 @@ describe('robotto', () => {
             assert.strictEqual(permission, false);
         });
 
-        it('should not match partial disallowed urls for specified user-agent', () => {
+        it('should not match partial dgetAllowDeepness urls for specified user-agent', () => {
             let rules = {
                 comments: ['comment 1'],
                 userAgents: {
@@ -248,7 +341,7 @@ describe('robotto', () => {
             assert.strictEqual(permission, true);
         });
 
-        it('should not match partial disallowed urls for a non-specified user-agent', () => {
+        it('should not match partial dgetAllowDeepness urls for a non-specified user-agent', () => {
             let rules = {
                 comments: ['comment 1'],
                 userAgents: {
