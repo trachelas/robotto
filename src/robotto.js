@@ -81,7 +81,13 @@ robotto.parse = function(robotsFile) {
     return rulesObj;
 };
 
-robotto.getAllowDeepness = function(userAgent, urlParam, rulesObj) {
+robotto.getRuleDeepness = function(ruleName, userAgent, urlParam, rulesObj) {
+    // Returns -1 if ruleName is invalid
+    ruleName = ruleName.toLowerCase();
+    if (ruleName !== 'allow' && ruleName !== 'disallow') {
+        return -1;
+    }
+
     let agentList = Object.keys(rulesObj.userAgents);
     let rules = rulesObj.userAgents;
     let routes = (url.parse(urlParam).pathname + '/').split('/');
@@ -92,7 +98,7 @@ robotto.getAllowDeepness = function(userAgent, urlParam, rulesObj) {
 
     // Checks rules for specified user agents
     if (agentList.indexOf(userAgent) !== -1) {
-        let userAgentRules = rulesObj.userAgents[userAgent].allow;
+        let userAgentRules = rulesObj.userAgents[userAgent][ruleName];
 
         userAgentRules.forEach((route) => {
             let registeredSubPaths = route.split('/').filter(Boolean);
@@ -118,7 +124,7 @@ robotto.getAllowDeepness = function(userAgent, urlParam, rulesObj) {
 
     // Checks generic rules
     if (agentList.indexOf('*') !== -1) {
-        let userAgentRules = rulesObj.userAgents['*'].allow;
+        let userAgentRules = rulesObj.userAgents['*'][ruleName];
 
         userAgentRules.forEach((route) => {
             let registeredSubPaths = route.split('/').filter(Boolean);
