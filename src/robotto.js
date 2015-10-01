@@ -88,18 +88,13 @@ robotto.getRuleDeepness = function(ruleName, userAgent, urlParam, rulesObj) {
         return -1;
     }
 
-    let agentList = Object.keys(rulesObj.userAgents);
+    // filter(Boolean) removes empty strings
+    let routes = (url.parse(urlParam).pathname + '/').split('/').filter(Boolean);
     let rules = rulesObj.userAgents;
-    let routes = (url.parse(urlParam).pathname + '/').split('/');
     let permission = 0;
 
-    // Clears empty values after splitting routes
-    routes = routes.filter(Boolean);
-
-    // Checks rules for specified user agents
-    if (agentList.indexOf(userAgent) !== -1) {
+    if (rules.hasOwnProperty(userAgent)) {
         let userAgentRules = rulesObj.userAgents[userAgent][ruleName];
-
         userAgentRules.forEach((route) => {
             let registeredSubPaths = route.split('/').filter(Boolean);
             let i = 0;
@@ -122,29 +117,13 @@ robotto.getRuleDeepness = function(ruleName, userAgent, urlParam, rulesObj) {
         });
     }
 
-    // Checks generic rules
-    if (agentList.indexOf('*') !== -1) {
-        let userAgentRules = rulesObj.userAgents['*'][ruleName];
-
-        userAgentRules.forEach((route) => {
-            let registeredSubPaths = route.split('/').filter(Boolean);
-            let i = 0;
-            routes.some((subPath) => {
-                if (subPath === registeredSubPaths[i]) {
-                    i++;
-                } else {
-                    i = 0;
-                    return true;
-                }
-            });
-
-            if (i > permission) {
-                permission = i;
-            }
-        });
+    // Calls itself looking for general rules after fetching specific rules
+    let generalPermission = 0;
+    if (userAgent !== '*') {
+        generalPermission = this.getRuleDeepness(ruleName, '*', urlParam, rulesObj);
     }
 
-    return permission;
+    return (generalPermission > permission) ? generalPermission : permission;
 };
 
 robotto.check = function(userAgent, urlParam, rulesObj) {
