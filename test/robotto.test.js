@@ -228,7 +228,7 @@ describe('robotto', () => {
             assert.strictEqual(permission, 0);
         });
 
-        it('should return 0 for an partially wrong match using a specified user-agent', () => {
+        it('should return 0 for a partially wrong match using a specified user-agent', () => {
             let rules = {
                 comments: ['comment 1'],
                 userAgents: {
