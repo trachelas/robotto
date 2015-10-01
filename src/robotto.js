@@ -101,9 +101,9 @@ robotto.getRuleDeepness = function(ruleName, userAgent, urlParam, rulesObj) {
             let ruleSubPaths = rule.split('/').filter(Boolean);
             let i = 0;
 
-            // If the rule equals to '/' it has the max permission value possible
+            // If the rule equals to '/' it has the minimum permission value possible
             if (ruleSubPaths.length === 0) {
-                permission = Number.MAX_VALUE;
+                permission = Number.MIN_VALUE;
             }
 
             // For each path match adds 1 to i
