@@ -88,21 +88,30 @@ robotto.getRuleDeepness = function(ruleName, userAgent, urlParam, rulesObj) {
         return -1;
     }
 
-    // filter(Boolean) removes empty strings
-    let routes = (url.parse(urlParam).pathname + '/').split('/').filter(Boolean);
+    // .filter(Boolean) removes empty strings
+    let desiredSubPaths = (url.parse(urlParam).pathname + '/').split('/').filter(Boolean);
     let rules = rulesObj.userAgents;
     let permission = 0;
 
     if (rules.hasOwnProperty(userAgent)) {
         let userAgentRules = rulesObj.userAgents[userAgent][ruleName];
-        userAgentRules.forEach((route) => {
-            let registeredSubPaths = route.split('/').filter(Boolean);
+
+        // Scans every rule for this user-agent
+        userAgentRules.forEach((rule) => {
+            let ruleSubPaths = rule.split('/').filter(Boolean);
             let i = 0;
 
+            // If the rule equals to '/' it has the max permission value possible
+            if (ruleSubPaths.length === 0) {
+                permission = Number.MAX_VALUE;
+            }
+
             // For each path match adds 1 to i
-            routes.some((subPath) => {
-                if (subPath === registeredSubPaths[i]) {
+            ruleSubPaths.some((subPath) => {
+                if (subPath === desiredSubPaths[i]) {
                     i++;
+                } else if (desiredSubPaths[i] === undefined) {
+                    return true;
                 } else {
                     // If full path does not match it has no permissions
                     i = 0;
