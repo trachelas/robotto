@@ -295,6 +295,21 @@ describe('robotto', () => {
             let permission = robotto.getRuleDeepness('UnknownRule', 'UnknownAgent', '/one/two/three/', rules);
             assert.strictEqual(permission, -1);
         });
+
+        it('should return Number.MIN_VALUE when checking permissions for "/"', () => {
+            let rules = {
+                comments: ['comment 1'],
+                userAgents: {
+                    '007': {
+                        allow: ['/one/two/three/'],
+                        disallow: ['/']
+                    }
+                }
+            };
+
+            let permission = robotto.getRuleDeepness('disallow', '007', '/', rules);
+            assert.strictEqual(permission, Number.MIN_VALUE);
+        });
     });
 
     describe('check', () => {
