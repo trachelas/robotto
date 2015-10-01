@@ -138,43 +138,15 @@ robotto.getRuleDeepness = function(ruleName, userAgent, urlParam, rulesObj) {
 robotto.check = function(userAgent, urlParam, rulesObj) {
     let userAgents = Object.keys(rulesObj.userAgents);
     let rules = rulesObj.userAgents;
-    let desiredRoute = (url.parse(urlParam).pathname + '/').split('/')[1];
-    let allowed = true;
 
-    // Searches for every user agent until it gets a match
-    // The 'return true' statements are used to break the .some() loop
-    userAgents.some((agent) => {
-        if (agent === userAgent) {
-            // Check if route is disallowed
-            let disallowedRoutes = rules[agent].disallow;
-            disallowedRoutes.some((route) => {
-                if (desiredRoute === route.split('/')[1]) {
-                    allowed = false;
-                    return true;
-                } else if (route === '/') {
-                    allowed = false;
-                    return true;
-                }
-            });
-            return true;
-        }
-    });
+    let allowLevel = this.getRuleDeepness('allow', userAgent, urlParam, rulesObj);
+    let disallowLevel = this.getRuleDeepness('disallow', userAgent, urlParam, rulesObj);
 
-    // Checks the general rules
-    if (userAgents.indexOf('*') !== -1) {
-        let allDisallowedRoutes = rules['*'].disallow;
-        allDisallowedRoutes.some((route) => {
-            if (desiredRoute === route.split('/')[1]) {
-                allowed = false;
-                return true;
-            } else if (route === '/') {
-                allowed = false;
-                return true;
-            }
-        });
-    }
+    // Positive if allow rule is more specific
+    // Negative if disallow rule is more specific
+    let finalPermissionLevel = allowLevel - disallowLevel;
 
-    return allowed;
+    return (finalPermissionLevel >= 0) ? true : false;
 };
 
 robotto.canCrawl = function(userAgent, urlParam, callback) {
