@@ -228,7 +228,7 @@ describe('robotto', () => {
             assert.strictEqual(permission, 0);
         });
 
-        it('should return 0 for an incomplete match using a specified user-agent', () => {
+        it('should return 0 for an partially wrong match using a specified user-agent', () => {
             let rules = {
                 comments: ['comment 1'],
                 userAgents: {
@@ -245,6 +245,25 @@ describe('robotto', () => {
 
             let permission = robotto.getRuleDeepness('Disallow', '007', '/one/two/four/', rules);
             assert.strictEqual(permission, 0);
+        });
+
+        it('should return deepness for an incomplete correct match ', () => {
+            let rules = {
+                comments: ['comment 1'],
+                userAgents: {
+                    '007': {
+                        allow: ['/'],
+                        disallow: ['/one/two/three/']
+                    },
+                    '*': {
+                        allow: ['/'],
+                        disallow: ['/first/second/']
+                    }
+                }
+            };
+
+            let permission = robotto.getRuleDeepness('Disallow', '007', '/one/two/', rules);
+            assert.strictEqual(permission, 2);
         });
 
         it('should return 0 when using unknown user-agent and there are no general rules', () => {
