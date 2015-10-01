@@ -310,55 +310,29 @@ describe('robotto', () => {
             let permission = robotto.getRuleDeepness('disallow', '007', '/', rules);
             assert.strictEqual(permission, Number.MIN_VALUE);
         });
-    });
 
-    describe('check', () => {
-        it('should find a disallowed route for a specified agent', () => {
-            let permission1 = robotto.check('007', 'http://secrets.com/admin/login', fake.rules());
-            let permission2 = robotto.check('007', 'http://secrets.com/admin', fake.rules());
-
-            assert.strictEqual(permission1, false);
-            assert.strictEqual(permission2, false);
-        });
-
-        it('should find an allowed route for a specified agent', () => {
-            let permission1 = robotto.check('007', 'http://secrets.com/blog-post/i-love-spies', fake.rules());
-            let permission2 = robotto.check('007', 'http://secrets.com/blog-post', fake.rules());
-
-            assert.strictEqual(permission1, true);
-            assert.strictEqual(permission2, true);
-        });
-
-        it('should find a disallowed route for a non-specified agent', () => {
-            let permission1 = robotto.check('NotKnownSpy', 'http://secrets.com/spies/daniel-craig', fake.rules());
-            let permission2 = robotto.check('NotKnownSpy', 'http://secrets.com/spies', fake.rules());
-
-            assert.strictEqual(permission1, false);
-            assert.strictEqual(permission2, false);
-        });
-
-        it('should know every route is disallowed for a specified user agent', () => {
+        it('should return correct deepness for routes with more parameters than specified in the rules', () => {
             let rules = {
                 comments: ['comment 1'],
                 userAgents: {
                     '007': {
-                        allow: [],
+                        allow: ['/one/two/'],
                         disallow: ['/']
                     }
                 }
             };
 
-            let permission = robotto.check('007', 'http://secrets.com/crazy-route/whatever', rules);
-            assert.strictEqual(permission, false);
+            let permission = robotto.getRuleDeepness('allow', '007', '/one/two/three', rules);
+            assert.strictEqual(permission, 2);
         });
 
-        it('should know every route is disallowed for a non-specified user agent', () => {
+        it('should not match partial params', () => {
             let rules = {
                 comments: ['comment 1'],
                 userAgents: {
                     '*': {
                         allow: [],
-                        disallow: ['/']
+                        disallow: ['/love/']
                     },
                     '007': {
                         allow: [],
@@ -367,9 +341,10 @@ describe('robotto', () => {
                 }
             };
 
-            let permission = robotto.check('NotKnownSpy', 'http://secrets.com/crazy-route/whatever', rules);
-            assert.strictEqual(permission, false);
+            let permission = robotto.getRuleDeepness('disallow', 'Unknown', 'http://secrets.com/lov', rules);
+            assert.strictEqual(permission, 0);
         });
+    });
 
         it('should not match partial disallowed urls for specified user-agent', () => {
             let rules = {
