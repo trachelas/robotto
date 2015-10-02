@@ -113,9 +113,41 @@ robotto.fetch('https://nodejs.org/api/cluster.html', function(error, content) {
 });
 ```
 
+#### robotto.getRuleDeepness(ruleName, userAgent, urlParam, rulesObj)
+Returns the deepness (precision) for a rule, because if an `allow` and a `disallow` rule conflict, the most specific is the one to be taken into account.
 
-#### robotto.check(userAgent, url, rulesObject);
-Checks if an user-agent has permission to crawl an url based on an object with rules.
+For example:
+* `/` is disallowed
+* `/magical-route` is allowed
+
+In this case we shouldn't be able to crawl any URL except the ones into `/magical-route/`, because it's the most specific rule.
+
+If the rule you requested is invalid it returns -1. If there isn't any rule for the url you want, it returns 0, otherwise it will return the deepness of the rule (number of parameters specified in `robots.txt`).
+
+##### Parameters
+* ruleName -> A string containing `allow` or `disallow`
+* userAgent -> The user-agent's name
+* url -> Any url
+* rulesObject -> An object with rules
+
+##### Example
+
+```js
+robotto.fetch('https://twitter.com', function(error, content) {
+    var rulesObj = robotto.parse(content);
+
+    var deepness = robotto.getRuleDeepness('disallow', 'myBot', 'https://twitter.com/search/realtime/new', rulesObj);
+
+    // Suposing that Twitter's robot.txt file contains:
+    // "disallow: /search/realtime/"
+    console.log(deepness) // --> 2
+
+    // Deepness is two because the routes '/search/' and '/realtime/' where specified
+});
+```
+
+#### robotto.check(userAgent, url, rulesObject)
+Checks if an user-agent has permission to crawl an url based on an object with rules. If there are contraditory rules the most specific will be considered.
 
 ##### Parameters
 * userAgent -> The user-agent's name
