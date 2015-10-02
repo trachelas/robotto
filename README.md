@@ -22,7 +22,7 @@ After installing robotto you need to require it using:
 
 Now you can call every single robotto's methods using your robotto variable!
 
-To check if a website allows you to crawl a certain url you just gotta call the `canCrawl(userAgent, fullUrl, callback)` method. Take a look below for an example on how to do this:
+**To check if a website allows you to crawl a certain url you just gotta call the `canCrawl(userAgent, fullUrl, callback)` method.** Take a look below for an example on how to do this:
 
 ```js
 var robotto = require('robotto');
@@ -137,7 +137,7 @@ robotto.fetch('http://www.amazon.com/gp/', function(error, content) {
 });
 ```
 
-#### robotto.canCrawl(userAgent, url, callback);
+#### robotto.canCrawl(userAgent, url, callback)
 Checks if an user-agent has permission to crawl an url.
 
 ##### Parameters
