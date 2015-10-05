@@ -81,46 +81,72 @@ robotto.parse = function(robotsFile) {
     return rulesObj;
 };
 
-robotto.check = function(userAgent, urlParam, rulesObj) {
-    let userAgents = Object.keys(rulesObj.userAgents);
-    let rules = rulesObj.userAgents;
-    let desiredRoute = (url.parse(urlParam).pathname + '/').split('/')[1];
-    let allowed = true;
+robotto.getRuleDeepness = function(ruleName, userAgent, urlParam, rulesObj) {
+    // Returns -1 if ruleName is invalid
+    ruleName = ruleName.toLowerCase();
+    if (ruleName !== 'allow' && ruleName !== 'disallow') {
+        return -1;
+    }
 
-    // Searches for every user agent until it gets a match
-    // The 'return true' statements are used to break the .some() loop
-    userAgents.some((agent) => {
-        if (agent === userAgent) {
-            // Check if route is disallowed
-            let disallowedRoutes = rules[agent].disallow;
-            disallowedRoutes.some((route) => {
-                if (desiredRoute === route.split('/')[1]) {
-                    allowed = false;
+    // .filter(Boolean) removes empty strings
+    let desiredSubPaths = (url.parse(urlParam).pathname + '/').split('/').filter(Boolean);
+    let rules = rulesObj.userAgents;
+    let permission = 0;
+
+    if (rules.hasOwnProperty(userAgent)) {
+        let userAgentRules = rulesObj.userAgents[userAgent][ruleName];
+
+        // Scans every rule for this user-agent
+        userAgentRules.forEach((rule) => {
+            let ruleSubPaths = rule.split('/').filter(Boolean);
+            let i = 0;
+
+            // If the rule equals to '/' it has the minimum permission value possible
+            if (ruleSubPaths.length === 0) {
+                permission = Number.MIN_VALUE;
+            }
+
+            // For each path match adds 1 to i
+            ruleSubPaths.some((subPath) => {
+                if (subPath === desiredSubPaths[i]) {
+                    i++;
+                } else if (desiredSubPaths[i] === undefined) {
                     return true;
-                } else if (route === '/') {
-                    allowed = false;
+                } else {
+                    // If full path does not match it has no permissions
+                    i = 0;
                     return true;
                 }
             });
-            return true;
-        }
-    });
 
-    // Checks the general rules
-    if (userAgents.indexOf('*') !== -1) {
-        let allDisallowedRoutes = rules['*'].disallow;
-        allDisallowedRoutes.some((route) => {
-            if (desiredRoute === route.split('/')[1]) {
-                allowed = false;
-                return true;
-            } else if (route === '/') {
-                allowed = false;
-                return true;
+            // If it's the deepest match until now replaces permission
+            if (i > permission) {
+                permission = i;
             }
         });
     }
 
-    return allowed;
+    // Calls itself looking for general rules after fetching specific rules
+    let generalPermission = 0;
+    if (userAgent !== '*') {
+        generalPermission = this.getRuleDeepness(ruleName, '*', urlParam, rulesObj);
+    }
+
+    return (generalPermission > permission) ? generalPermission : permission;
+};
+
+robotto.check = function(userAgent, urlParam, rulesObj) {
+    let userAgents = Object.keys(rulesObj.userAgents);
+    let rules = rulesObj.userAgents;
+
+    let allowLevel = this.getRuleDeepness('allow', userAgent, urlParam, rulesObj);
+    let disallowLevel = this.getRuleDeepness('disallow', userAgent, urlParam, rulesObj);
+
+    // Positive if allow rule is more specific
+    // Negative if disallow rule is more specific
+    let finalPermissionLevel = allowLevel - disallowLevel;
+
+    return (finalPermissionLevel >= 0) ? true : false;
 };
 
 robotto.canCrawl = function(userAgent, urlParam, callback) {
