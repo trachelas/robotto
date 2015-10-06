@@ -146,7 +146,7 @@ robotto.check = function(userAgent, urlParam, rulesObj) {
     // Negative if disallow rule is more specific
     let finalPermissionLevel = allowLevel - disallowLevel;
 
-    return (finalPermissionLevel >= 0) ? true : false;
+    return finalPermissionLevel >= 0;
 };
 
 robotto.canCrawl = function(userAgent, urlParam, callback) {
