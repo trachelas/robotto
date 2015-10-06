@@ -385,7 +385,7 @@ describe('robotto', () => {
             assert.strictEqual(permission2, false);
         });
 
-        it('should call getRuleDeepness for times for each call', () => {
+        it('should call getRuleDeepness four times for each call', () => {
             let getRuleDeepnessFunc = sandbox.spy(robotto, 'getRuleDeepness');
 
             let permission1 = robotto.check('007', 'http://secrets.com/admin/login', fake.rules());
