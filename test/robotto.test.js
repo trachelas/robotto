@@ -391,8 +391,9 @@ describe('robotto', () => {
             let permission1 = robotto.check('007', 'http://secrets.com/admin/login', fake.rules());
             assert.strictEqual(getRuleDeepnessFunc.callCount, 4);
 
+            getRuleDeepnessFunc.reset();
             let permission2 = robotto.check('007', 'http://secrets.com/admin', fake.rules());
-            assert.strictEqual(getRuleDeepnessFunc.callCount, 8);
+            assert.strictEqual(getRuleDeepnessFunc.callCount, 4);
         });
     });
 
