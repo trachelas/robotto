@@ -85,3 +85,5 @@ gulp.task('tag', () => {
         .pipe(shell([command]));
 });
 
+gulp.task('npm', shell.task(['npm publish']));
+
