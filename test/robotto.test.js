@@ -361,7 +361,6 @@ describe('robotto', () => {
     });
 
     describe('check', () => {
-
         it('should find an allowed route', () => {
             let getRuleDeepnessFunc = sandbox.stub(robotto, 'getRuleDeepness', (rule) => {
                 return (rule === 'allow') ? 1 : 0;
