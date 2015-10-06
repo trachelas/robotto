@@ -27,12 +27,17 @@ Now you can call every single robotto's methods using your robotto variable!
 ```js
 var robotto = require('robotto');
 
-robotto.canCrawl('ExampleBot', 'https://www.npmjs.com/browse/keyword/robotto', function(isAllowed) {
-  if (isAllowed) {
-    // Your crawling code goes here...
-  } else {
-    console.log('I am not allowed to crawl this url.');
-  }
+robotto.canCrawl('ExampleBot', 'https://www.npmjs.com/browse/keyword/robotto', function(err, isAllowed) {
+    if (err) {
+        console.error(err);
+        return;
+    }
+
+    if (isAllowed) {
+        // Your crawling code goes here...
+    } else {
+        console.log('I am not allowed to crawl this url.');
+    }
 });
 ```
 
@@ -63,18 +68,20 @@ Gets the content of the robots.txt file.
 
 ##### Parameters
 * url -> Any url
-* callback(error, content)
-    - error -> Errors, if any, otherwise `null`
+* callback(err, content)
+    - err -> Errors, if any, otherwise `null`
     - content -> Content of the robots.txt file
 
 ##### Example
 
 ```js
-robotto.fetch('https://nodejs.org/robots.txt', function(error, content) {
-    if(error)
-        console.log('There was an error.');
-    else
-        console.log('robots.txt content:\n' + content);
+robotto.fetch('https://nodejs.org/robots.txt', function(err, content) {
+    if (err) {
+        console.error(err);
+        return;
+    }
+
+    console.log('robots.txt content:\n' + content);
 });
 ```
 
@@ -106,10 +113,14 @@ This is an example of the rules object returned:
 ##### Example
 
 ```js
-robotto.fetch('https://nodejs.org/api/cluster.html', function(error, content) {
-    if(!error)
-        var rules = robotto.parse(content);
-        // Rules will have an object containing the robots.txt rules for nodejs.org
+robotto.fetch('https://nodejs.org/api/cluster.html', function(err, content) {
+    if (err) {
+        console.error(err);
+        return;
+    }
+
+    var rules = robotto.parse(content);
+    // Rules will have an object containing the robots.txt rules for nodejs.org
 });
 ```
 
@@ -133,9 +144,13 @@ If the rule you requested is invalid it returns -1. If there isn't any rule for 
 ##### Example
 
 ```js
-robotto.fetch('https://twitter.com', function(error, content) {
-    var rulesObj = robotto.parse(content);
+robotto.fetch('https://twitter.com', function(err, content) {
+    if (err) {
+        console.error(err);
+        return;
+    }
 
+    var rulesObj = robotto.parse(content);
     var deepness = robotto.getRuleDeepness('disallow', 'myBot', 'https://twitter.com/search/realtime/new', rulesObj);
 
     // Suposing that Twitter's robot.txt file contains:
@@ -157,15 +172,17 @@ Checks if an user-agent has permission to crawl an url based on an object with r
 ##### Example
 
 ```js
-robotto.fetch('http://www.amazon.com/gp/', function(error, content) {
-    if(!error) {
-        var rules = robotto.parse(content);
-        // Rules will have an object containing the robots.txt rules for amazon.com
-
-        var permission = robotto.check('MyBotName', 'http://www.amazon.com/gp/goldbox/', rules);
-
-        console.log('Permission to Crawl http://www.amazon.com/gp/goldbox/: ' + permission);
+robotto.fetch('http://www.amazon.com/gp/', function(err, content) {
+    if (err) {
+        console.error(err);
+        return;
     }
+
+    var rules = robotto.parse(content);
+    // Rules will have an object containing the robots.txt rules for amazon.com
+    var permission = robotto.check('MyBotName', 'http://www.amazon.com/gp/goldbox/', rules);
+
+    console.log('Permission to Crawl http://www.amazon.com/gp/goldbox/: ' + permission);
 });
 ```
 
@@ -175,19 +192,22 @@ Checks if an user-agent has permission to crawl an url.
 ##### Parameters
 * userAgent -> The name of your bot (your user-agent)
 * url -> Any url
-* callback(error, isAllowed)
-    - error -> Errors, if any, otherwise `null`
+* callback(err, isAllowed)
+    - err -> Errors, if any, otherwise `null`
     - isAllowed -> Boolean value indicating if this user-agent is allowed to crawl the url
 
 ##### Example
 
 ```js
-robotto.canCrawl('https://twitter.com/zenorocha', function(error, isAllowed) {
-    if(error)
-        console.log('There was an error.');
-    
-    if(isAllowed)
+robotto.canCrawl('https://twitter.com/zenorocha', function(err, isAllowed) {
+    if (err) {
+        console.error(err);
+        return;
+    }
+
+    if (isAllowed) {
         console.log('I can crawl this url!');
+    }
 });
 ```
 
