@@ -11,6 +11,7 @@ const coveralls = require('gulp-coveralls');
 const jscs = require('gulp-jscs');
 const babel = require('gulp-babel');
 const bump = require('gulp-bump');
+const shell = require('gulp-shell');
 
 gulp.task('nsp', (cb) => {
     nsp('package.json', cb);
@@ -73,5 +74,14 @@ gulp.task('bump', () => {
     return gulp.src('./package.json')
         .pipe(bump({type: type}))
         .pipe(gulp.dest('./'));
+});
+
+gulp.task('tag', () => {
+    let version = require('./package.json').version;
+    let command = `git add package.json && git commit --allow-empty -m "Release v${version}" &&
+        git tag v${version} && git push origin test --tags`;
+
+    return gulp.src('')
+        .pipe(shell([command]));
 });
 
