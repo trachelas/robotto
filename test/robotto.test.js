@@ -361,7 +361,6 @@ describe('robotto', () => {
     });
 
     describe('check', () => {
-
         it('should find an allowed route', () => {
             let getRuleDeepnessFunc = sandbox.stub(robotto, 'getRuleDeepness', (rule) => {
                 return (rule === 'allow') ? 1 : 0;
@@ -386,14 +385,15 @@ describe('robotto', () => {
             assert.strictEqual(permission2, false);
         });
 
-        it('should call getRuleDeepness for times for each call', () => {
+        it('should call getRuleDeepness four times for each call', () => {
             let getRuleDeepnessFunc = sandbox.spy(robotto, 'getRuleDeepness');
 
             let permission1 = robotto.check('007', 'http://secrets.com/admin/login', fake.rules());
             assert.strictEqual(getRuleDeepnessFunc.callCount, 4);
 
+            getRuleDeepnessFunc.reset();
             let permission2 = robotto.check('007', 'http://secrets.com/admin', fake.rules());
-            assert.strictEqual(getRuleDeepnessFunc.callCount, 8);
+            assert.strictEqual(getRuleDeepnessFunc.callCount, 4);
         });
     });
 
