@@ -10,6 +10,7 @@ const plumber = require('gulp-plumber');
 const coveralls = require('gulp-coveralls');
 const jscs = require('gulp-jscs');
 const babel = require('gulp-babel');
+const bump = require('gulp-bump');
 
 gulp.task('nsp', (cb) => {
     nsp('package.json', cb);
@@ -66,3 +67,11 @@ gulp.task('watch', () => {
 });
 
 gulp.task('prepublish', ['jscs', 'test', 'nsp', 'babel']);
+gulp.task('bump', () => {
+    let type = process.argv[process.argv.length - 1].slice(2);
+
+    return gulp.src('./package.json')
+        .pipe(bump({type: type}))
+        .pipe(gulp.dest('./'));
+});
+
