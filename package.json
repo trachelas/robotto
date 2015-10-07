@@ -48,10 +48,10 @@
     "gulp-nsp": "^0.4.5",
     "gulp-plumber": "^1.0.0",
     "gulp-shell": "^0.4.3",
+    "run-sequence": "^1.1.4",
     "sinon": "^1.17.1"
   },
   "scripts": {
-    "prepublish": "gulp prepublish",
     "test": "gulp test"
   },
   "license": "MIT",
