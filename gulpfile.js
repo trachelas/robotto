@@ -64,10 +64,9 @@ gulp.task('jscs', () => {
 });
 
 gulp.task('watch', () => {
-    gulp.watch('**/*.js', ['prepublish']);
+    gulp.watch('**/*.js', ['build']);
 });
 
-gulp.task('prepublish', ['jscs', 'test', 'nsp', 'babel']);
 gulp.task('bump', () => {
     let type = process.argv[process.argv.length - 1].slice(2);
 
@@ -86,4 +85,6 @@ gulp.task('tag', () => {
 });
 
 gulp.task('npm', shell.task(['npm publish']));
+
+gulp.task('build', ['jscs', 'test', 'nsp', 'babel']);
 
