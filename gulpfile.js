@@ -10,6 +10,10 @@ const plumber = require('gulp-plumber');
 const coveralls = require('gulp-coveralls');
 const jscs = require('gulp-jscs');
 const babel = require('gulp-babel');
+const bump = require('gulp-bump');
+const shell = require('gulp-shell');
+const runSequence = require('run-sequence');
+const fs = require('fs');
 
 gulp.task('nsp', (cb) => {
     nsp('package.json', cb);
@@ -62,7 +66,38 @@ gulp.task('jscs', () => {
 });
 
 gulp.task('watch', () => {
-    gulp.watch('**/*.js', ['prepublish']);
+    gulp.watch('**/*.js', ['build']);
 });
 
-gulp.task('prepublish', ['jscs', 'test', 'nsp', 'babel']);
+gulp.task('bump', () => {
+    let type = process.argv[process.argv.length - 1].slice(2);
+
+    return gulp.src('./package.json')
+        .pipe(bump({type: type}))
+        .pipe(gulp.dest('./'));
+});
+
+gulp.task('tag', (cb) => {
+    fs.readFile('./package.json', (err, file) => {
+        if (err) {
+            throw err;
+        }
+
+        let version = JSON.parse(file).version;
+        let command = `git add package.json && git commit --allow-empty -m "Release v${version}" &&
+            git tag v${version} && git push origin master --tags`;
+
+        gulp.src('')
+            .pipe(shell([command]))
+            .on('end', cb);
+    });
+});
+
+gulp.task('npm', shell.task(['npm publish']));
+
+gulp.task('publish', (cb) => {
+    runSequence('build', 'bump', 'tag', 'npm', cb);
+});
+
+gulp.task('build', ['jscs', 'test', 'nsp', 'babel']);
+
