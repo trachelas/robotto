@@ -136,9 +136,6 @@ robotto.getRuleDeepness = function(ruleName, userAgent, urlParam, rulesObj) {
 };
 
 robotto.check = function(userAgent, urlParam, rulesObj) {
-    let userAgents = Object.keys(rulesObj.userAgents);
-    let rules = rulesObj.userAgents;
-
     let allowLevel = this.getRuleDeepness('allow', userAgent, urlParam, rulesObj);
     let disallowLevel = this.getRuleDeepness('disallow', userAgent, urlParam, rulesObj);
 

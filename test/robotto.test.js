@@ -348,21 +348,21 @@ describe('robotto', () => {
         it('should call itself when user agent is not \'*\'', () => {
             let getRuleDeepnessFunc = sandbox.spy(robotto, 'getRuleDeepness');
 
-            let permission = robotto.getRuleDeepness('disallow', 'Unknown', 'http://secrets.com/lov', fake.rules());
+            robotto.getRuleDeepness('disallow', 'Unknown', 'http://secrets.com/lov', fake.rules());
             sinon.assert.calledTwice(getRuleDeepnessFunc);
         });
 
         it('should not call itself when user agent is \'*\'', () => {
             let getRuleDeepnessFunc = sandbox.spy(robotto, 'getRuleDeepness');
 
-            let permission = robotto.getRuleDeepness('disallow', '*', 'http://secrets.com/lov', fake.rules());
+            robotto.getRuleDeepness('disallow', '*', 'http://secrets.com/lov', fake.rules());
             sinon.assert.calledOnce(getRuleDeepnessFunc);
         });
     });
 
     describe('check', () => {
         it('should find an allowed route', () => {
-            let getRuleDeepnessFunc = sandbox.stub(robotto, 'getRuleDeepness', (rule) => {
+            sandbox.stub(robotto, 'getRuleDeepness', (rule) => {
                 return (rule === 'allow') ? 1 : 0;
             });
 
@@ -388,11 +388,11 @@ describe('robotto', () => {
         it('should call getRuleDeepness four times for each call', () => {
             let getRuleDeepnessFunc = sandbox.spy(robotto, 'getRuleDeepness');
 
-            let permission1 = robotto.check('007', 'http://secrets.com/admin/login', fake.rules());
+            robotto.check('007', 'http://secrets.com/admin/login', fake.rules());
             assert.strictEqual(getRuleDeepnessFunc.callCount, 4);
 
             getRuleDeepnessFunc.reset();
-            let permission2 = robotto.check('007', 'http://secrets.com/admin', fake.rules());
+            robotto.check('007', 'http://secrets.com/admin', fake.rules());
             assert.strictEqual(getRuleDeepnessFunc.callCount, 4);
         });
     });
