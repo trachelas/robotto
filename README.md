@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/trachelas/robotto.svg?branch=master)](https://travis-ci.org/trachelas/robotto) [![Coverage Status](https://coveralls.io/repos/trachelas/robotto/badge.svg?branch=master&service=github)](https://coveralls.io/github/trachelas/robotto?branch=master) [![This is Awesome](https://img.shields.io/badge/awesomeness-100%25-ff69b4.svg)](http://www.catgifpage.com/)
+[![Build Status](https://travis-ci.org/trachelas/robotto.svg?branch=master)](https://travis-ci.org/trachelas/robotto) [![Coverage Status](https://coveralls.io/repos/trachelas/robotto/badge.svg?branch=master&service=github)](https://coveralls.io/github/trachelas/robotto?branch=master) [![Code Quality Status](https://api.codacy.com/project/badge/638419f1c4b54faca6d04aa399ea215c)](https://www.codacy.com/app/fernandesdacostalucas/robotto) [![This is Awesome](https://img.shields.io/badge/awesomeness-100%25-ff69b4.svg)](http://www.catgifpage.com/)
 
 # robotto
 Easily read, parse and check permissions on robots.txt files!
