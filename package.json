@@ -38,7 +38,7 @@
   "devDependencies": {
     "chai": "^3.4.0",
     "gulp": "^3.9.0",
-    "gulp-babel": "^5.2.1",
+    "gulp-babel": "^6.1.0",
     "gulp-bump": "^1.0.0",
     "gulp-coveralls": "^0.1.0",
     "gulp-exclude-gitignore": "^1.0.0",
