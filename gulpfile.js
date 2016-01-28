@@ -82,19 +82,18 @@ gulp.task('bump', () => {
 });
 
 gulp.task('tag', (cb) => {
-        let version = require('./package.json').version;
+    let version = require('./package.json').version;
 
-        if (version !== Object(version)) {
-            throw new Error(`Current package.json version is invalid.`);
-        }
+    if (version !== Object(version)) {
+        throw new Error(`Current package.json version is invalid.`);
+    }
 
-        let command = `git add package.json && git commit --allow-empty -m "Release v${version}" &&
-            git tag v${version} && git push origin master --tags`;
+    let command = `git add package.json && git commit --allow-empty -m "Release v${version}" &&
+        git tag v${version} && git push origin master --tags`;
 
-        gulp.src('')
-            .pipe(shell([command]))
-            .on('end', cb);
-    });
+    gulp.src('')
+        .pipe(shell([command]))
+        .on('end', cb);
 });
 
 gulp.task('npm', shell.task(['npm publish']));
