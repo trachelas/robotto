@@ -8,7 +8,7 @@ const istanbul = require('gulp-istanbul');
 const nsp = require('gulp-nsp');
 const plumber = require('gulp-plumber');
 const coveralls = require('gulp-coveralls');
-const jscs = require('gulp-jscs');
+const eslint = require('gulp-eslint');
 const babel = require('gulp-babel');
 const bump = require('gulp-bump');
 const shell = require('gulp-shell');
@@ -57,11 +57,12 @@ gulp.task('babel', () => {
         .pipe(gulp.dest('lib'));
 });
 
-gulp.task('jscs', () => {
+gulp.task('eslint', () => {
     return gulp.src('**/*.js')
         .pipe(excludeGitignore())
-        .pipe(jscs())
-        .pipe(jscs.reporter());
+        .pipe(eslint())
+        .pipe(eslint.formatEach())
+        .pipe(eslint.failAfterError());
 });
 
 gulp.task('watch', () => {
@@ -102,5 +103,4 @@ gulp.task('publish', (cb) => {
     runSequence('build', 'bump', 'tag', 'npm', cb);
 });
 
-gulp.task('build', ['jscs', 'test', 'nsp', 'babel']);
-
+gulp.task('build', ['eslint', 'test', 'nsp', 'babel']);
