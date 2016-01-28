@@ -72,6 +72,10 @@ gulp.task('watch', () => {
 gulp.task('bump', () => {
     let type = process.argv[process.argv.length - 1].slice(2);
 
+    if (typeof type !== 'string') {
+        throw new Error(`Please provide version increase type: patch, minor or major`);
+    }
+
     return gulp.src('./package.json')
         .pipe(bump({type: type}))
         .pipe(gulp.dest('./'));
