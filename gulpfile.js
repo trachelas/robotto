@@ -88,8 +88,10 @@ gulp.task('tag', (cb) => {
         throw new Error(`Current package.json version is invalid.`);
     }
 
-    let command = `git add package.json && git commit --allow-empty -m "Release v${version}" &&
-        git tag v${version} && git push origin master --tags`;
+    let command = `git add package.json &&
+        git commit --allow-empty -m "Release v${version}" &&
+        git tag v${version} &&
+        git push origin master --tags`;
 
     gulp.src('')
         .pipe(shell([command]))
@@ -98,8 +100,9 @@ gulp.task('tag', (cb) => {
 
 gulp.task('npm', shell.task(['npm publish']));
 
+// Publishes package to npm
 gulp.task('publish', (cb) => {
-    runSequence('build', 'bump', 'tag', 'npm', cb);
+    sequence(['build', 'bump'], 'tag', 'npm', cb);
 });
 
 // Does full a build
