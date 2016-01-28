@@ -1,4 +1,3 @@
-// jscs:disable maximumLineLength
 'use strict';
 
 const assert = require('chai').assert;
