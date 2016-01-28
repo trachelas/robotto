@@ -15,7 +15,7 @@ const shell = require('gulp-shell');
 const sequence = require('gulp-sequence');
 
 gulp.task('nsp', (cb) => {
-    nsp('package.json', cb);
+    return nsp({package: `${__dirname}/package.json`}, cb);
 });
 
 gulp.task('eslint', () => {
