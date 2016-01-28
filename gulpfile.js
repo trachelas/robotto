@@ -58,7 +58,7 @@ gulp.task('babel', () => {
 });
 
 gulp.task('eslint', () => {
-    return gulp.src('**/*.js')
+    return gulp.src(['**/*.js', 'lib/**/*.js'])
         .pipe(excludeGitignore())
         .pipe(eslint())
         .pipe(eslint.formatEach())
