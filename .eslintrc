@@ -22,7 +22,7 @@
         "computed-property-spacing": [2, "never"],
         "indent": 2,
         "key-spacing": [2, {"beforeColon": false, "afterColon": true}],
-        "max-len": [1, 120, 4],
+        "max-len": [2, 120, 4, {"ignoreComments": true, "ignoreUrls": true}],
         "no-array-constructor": 2,
         "no-bitwise": 2,
         "no-multiple-empty-lines": 1,
