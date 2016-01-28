@@ -12,14 +12,28 @@ const eslint = require('gulp-eslint');
 const babel = require('gulp-babel');
 const bump = require('gulp-bump');
 const shell = require('gulp-shell');
-const runSequence = require('run-sequence');
+const sequence = require('gulp-sequence');
 
 gulp.task('nsp', (cb) => {
     nsp('package.json', cb);
 });
 
-gulp.task('pre-test', () => {
+gulp.task('eslint', () => {
+    return gulp.src(['**/*.js', '!lib/**/*.js'])
+        .pipe(excludeGitignore())
+        .pipe(eslint())
+        .pipe(eslint.formatEach())
+        .pipe(eslint.failAfterError());
+});
+
+gulp.task('babel', () => {
     return gulp.src('src/**/*.js')
+        .pipe(babel())
+        .pipe(gulp.dest('lib'));
+});
+
+gulp.task('pre-test', ['babel'], () => {
+    return gulp.src('lib/**/*.js')
         .pipe(istanbul({
             includeUntested: true
         }))
@@ -49,20 +63,6 @@ gulp.task('coveralls', ['test'], () => {
 
     return gulp.src(path.join(__dirname, 'coverage/lcov.info'))
         .pipe(coveralls());
-});
-
-gulp.task('babel', () => {
-    return gulp.src('src/**/*.js')
-        .pipe(babel())
-        .pipe(gulp.dest('lib'));
-});
-
-gulp.task('eslint', () => {
-    return gulp.src(['**/*.js', 'lib/**/*.js'])
-        .pipe(excludeGitignore())
-        .pipe(eslint())
-        .pipe(eslint.formatEach())
-        .pipe(eslint.failAfterError());
 });
 
 gulp.task('watch', () => {
@@ -102,4 +102,5 @@ gulp.task('publish', (cb) => {
     runSequence('build', 'bump', 'tag', 'npm', cb);
 });
 
-gulp.task('build', ['eslint', 'test', 'nsp', 'babel']);
+// Does full a build
+gulp.task('build', ['nsp', 'eslint', 'coveralls']);

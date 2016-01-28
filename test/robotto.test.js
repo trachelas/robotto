@@ -3,7 +3,7 @@
 const assert = require('chai').assert;
 const sinon = require('sinon');
 const request = require('request');
-const robotto = require('../src/robotto');
+const robotto = require('../lib/robotto');
 const fake = require('./fake');
 
 let sandbox = sinon.sandbox.create();
