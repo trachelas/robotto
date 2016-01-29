@@ -1,10 +1,9 @@
-// jscs:disable maximumLineLength
 'use strict';
 
 const assert = require('chai').assert;
 const sinon = require('sinon');
 const request = require('request');
-const robotto = require('../src/robotto');
+const robotto = require('../lib/robotto');
 const fake = require('./fake');
 
 let sandbox = sinon.sandbox.create();
@@ -363,7 +362,7 @@ describe('robotto', () => {
     describe('check', () => {
         it('should find an allowed route', () => {
             sandbox.stub(robotto, 'getRuleDeepness', (rule) => {
-                return (rule === 'allow') ? 1 : 0;
+                return rule === 'allow' ? 1 : 0;
             });
 
             let permission1 = robotto.check('007', 'http://secrets.com/blog-post/nice-car', fake.rules());
@@ -375,7 +374,7 @@ describe('robotto', () => {
 
         it('should find a disallowed route', () => {
             sandbox.stub(robotto, 'getRuleDeepness', (rule) => {
-                return (rule === 'disallow') ? 1 : 0;
+                return rule === 'disallow' ? 1 : 0;
             });
 
             let permission1 = robotto.check('007', 'http://secrets.com/admin/login', fake.rules());

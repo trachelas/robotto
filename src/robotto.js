@@ -89,7 +89,7 @@ robotto.getRuleDeepness = function(ruleName, userAgent, urlParam, rulesObj) {
     }
 
     // .filter(Boolean) removes empty strings
-    let desiredSubPaths = (url.parse(urlParam).pathname + '/').split('/').filter(Boolean);
+    let desiredSubPaths = `${url.parse(urlParam).pathname}/`.split('/').filter(Boolean);
     let rules = rulesObj.userAgents;
     let permission = 0;
 
@@ -132,7 +132,7 @@ robotto.getRuleDeepness = function(ruleName, userAgent, urlParam, rulesObj) {
         generalPermission = this.getRuleDeepness(ruleName, '*', urlParam, rulesObj);
     }
 
-    return (generalPermission > permission) ? generalPermission : permission;
+    return generalPermission > permission ? generalPermission : permission;
 };
 
 robotto.check = function(userAgent, urlParam, rulesObj) {

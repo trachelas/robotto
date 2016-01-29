@@ -8,19 +8,32 @@ const istanbul = require('gulp-istanbul');
 const nsp = require('gulp-nsp');
 const plumber = require('gulp-plumber');
 const coveralls = require('gulp-coveralls');
-const jscs = require('gulp-jscs');
+const eslint = require('gulp-eslint');
 const babel = require('gulp-babel');
 const bump = require('gulp-bump');
-const shell = require('gulp-shell');
-const runSequence = require('run-sequence');
-const fs = require('fs');
+const sequence = require('gulp-sequence');
+const git = require('gulp-git');
 
 gulp.task('nsp', (cb) => {
-    nsp('package.json', cb);
+    return nsp({package: `${__dirname}/package.json`}, cb);
 });
 
-gulp.task('pre-test', () => {
+gulp.task('eslint', () => {
+    return gulp.src(['**/*.js', '!lib/**/*.js'])
+        .pipe(excludeGitignore())
+        .pipe(eslint())
+        .pipe(eslint.formatEach())
+        .pipe(eslint.failAfterError());
+});
+
+gulp.task('babel', () => {
     return gulp.src('src/**/*.js')
+        .pipe(babel())
+        .pipe(gulp.dest('lib'));
+});
+
+gulp.task('pre-test', ['babel'], () => {
+    return gulp.src('lib/**/*.js')
         .pipe(istanbul({
             includeUntested: true
         }))
@@ -38,6 +51,7 @@ gulp.task('test', ['pre-test'], (cb) => {
             mochaErr = err;
         })
         .pipe(istanbul.writeReports())
+        .pipe(istanbul.enforceThresholds({thresholds: {global: 100}}))
         .on('end', () => {
             cb(mochaErr);
         });
@@ -52,19 +66,6 @@ gulp.task('coveralls', ['test'], () => {
         .pipe(coveralls());
 });
 
-gulp.task('babel', () => {
-    return gulp.src('src/**/*.js')
-        .pipe(babel())
-        .pipe(gulp.dest('lib'));
-});
-
-gulp.task('jscs', () => {
-    return gulp.src('**/*.js')
-        .pipe(excludeGitignore())
-        .pipe(jscs())
-        .pipe(jscs.reporter());
-});
-
 gulp.task('watch', () => {
     gulp.watch('**/*.js', ['build']);
 });
@@ -72,32 +73,41 @@ gulp.task('watch', () => {
 gulp.task('bump', () => {
     let type = process.argv[process.argv.length - 1].slice(2);
 
+    if (typeof type !== 'string') {
+        throw new Error(`Please provide version increase type: patch, minor or major`);
+    }
+
     return gulp.src('./package.json')
         .pipe(bump({type: type}))
         .pipe(gulp.dest('./'));
 });
 
-gulp.task('tag', (cb) => {
-    fs.readFile('./package.json', (err, file) => {
-        if (err) {
-            throw err;
-        }
+gulp.task('tag', () => {
+    let versionNumber = require('./package.json').version;
+    let version = `v${versionNumber}`;
 
-        let version = JSON.parse(file).version;
-        let command = `git add package.json && git commit --allow-empty -m "Release v${version}" &&
-            git tag v${version} && git push origin master --tags`;
+    if (versionNumber !== Object(versionNumber)) {
+        throw new Error(`Current package.json version is invalid.`);
+    }
 
-        gulp.src('')
-            .pipe(shell([command]))
-            .on('end', cb);
-    });
+    return gulp.src('./package.json')
+        .pipe(git.add())
+        .pipe(git.commit(`Release ${version}`, {args: '--allow-empty'}))
+        .pipe(git.tag(version, `Release ${version}`))
+        .pipe(git.push('origin', 'master', '--tags'))
+        .pipe(gulp.dest('./'));
 });
 
-gulp.task('npm', shell.task(['npm publish']));
+gulp.task('npm', ['tag'], (cb) => {
+    require('child_process')
+        .spawn('npm', ['publish'], {stdio: 'inherit'})
+        .on('close', cb);
+});
 
+// Publishes package to npm
 gulp.task('publish', (cb) => {
-    runSequence('build', 'bump', 'tag', 'npm', cb);
+    sequence(['build', 'bump'], 'tag', 'npm', cb);
 });
 
-gulp.task('build', ['jscs', 'test', 'nsp', 'babel']);
-
+// Does full a build
+gulp.task('build', ['nsp', 'eslint', 'coveralls']);
