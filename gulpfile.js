@@ -11,8 +11,8 @@ const coveralls = require('gulp-coveralls');
 const eslint = require('gulp-eslint');
 const babel = require('gulp-babel');
 const bump = require('gulp-bump');
-const shell = require('gulp-shell');
 const sequence = require('gulp-sequence');
+const git = require('gulp-git');
 
 gulp.task('nsp', (cb) => {
     return nsp({package: `${__dirname}/package.json`}, cb);
@@ -82,24 +82,27 @@ gulp.task('bump', () => {
         .pipe(gulp.dest('./'));
 });
 
-gulp.task('tag', (cb) => {
-    let version = require('./package.json').version;
+gulp.task('tag', () => {
+    let versionNumber = require('./package.json').version;
+    let version = `v${versionNumber}`;
 
-    if (version !== Object(version)) {
+    if (versionNumber !== Object(versionNumber)) {
         throw new Error(`Current package.json version is invalid.`);
     }
 
-    let command = `git add package.json &&
-        git commit --allow-empty -m "Release v${version}" &&
-        git tag v${version} &&
-        git push origin master --tags`;
-
-    gulp.src('')
-        .pipe(shell([command]))
-        .on('end', cb);
+    return gulp.src('./package.json')
+        .pipe(git.add())
+        .pipe(git.commit(`Release ${version}`, {args: '--allow-empty'}))
+        .pipe(git.tag(version, `Release ${version}`))
+        .pipe(git.push('origin', 'master', '--tags'))
+        .pipe(gulp.dest('./'));
 });
 
-gulp.task('npm', shell.task(['npm publish']));
+gulp.task('npm', ['tag'], (cb) => {
+    require('child_process')
+        .spawn('npm', ['publish'], {stdio: 'inherit'})
+        .on('close', cb);
+});
 
 // Publishes package to npm
 gulp.task('publish', (cb) => {
