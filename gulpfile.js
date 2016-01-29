@@ -85,7 +85,7 @@ gulp.task('bump', () => {
         .pipe(gulp.dest('./'));
 });
 
-gulp.task('tag', () => {
+gulp.task('tag', ['bump'], () => {
     let versionNumber = require('./package.json').version;
     let version = `v${versionNumber}`;
 
@@ -109,7 +109,7 @@ gulp.task('npm', ['tag'], (cb) => {
 
 // Publishes package to npm
 gulp.task('publish', (cb) => {
-    sequence(['build', 'bump'], 'tag', 'npm', cb);
+    sequence('build', 'npm', cb);
 });
 
 // Does full a build
