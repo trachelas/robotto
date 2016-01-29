@@ -71,10 +71,13 @@ gulp.task('watch', () => {
 });
 
 gulp.task('bump', () => {
-    let type = process.argv[process.argv.length - 1].slice(2);
+    if (process.argv.length < 3) {
+        throw new Error(`Please provide an argument with increase type: --patch, --minor or --major`);
+    }
 
-    if (typeof type !== 'string') {
-        throw new Error(`Please provide version increase type: patch, minor or major`);
+    let type = process.argv[process.argv.length - 1].slice(2).toLowerCase();
+    if (type !== 'patch' && type !== 'minor' && type !== 'major') {
+        throw new Error(`Please provide a valid version increase type: --patch, --minor or --major`);
     }
 
     return gulp.src('./package.json')
@@ -100,8 +103,8 @@ gulp.task('tag', () => {
 
 gulp.task('npm', ['tag'], (cb) => {
     require('child_process')
-        .spawn('npm', ['publish'], {stdio: 'inherit'})
-        .on('close', cb);
+       .spawn('npm', ['publish'], {stdio: 'inherit'})
+       .on('close', cb);
 });
 
 // Publishes package to npm
