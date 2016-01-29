@@ -96,15 +96,15 @@ gulp.task('tag', () => {
     return gulp.src('./package.json')
         .pipe(git.add())
         .pipe(git.commit(`Release ${version}`, {args: '--allow-empty'}))
-        .pipe(git.tag(version, `Release ${version}`))
-        .pipe(git.push('origin', 'master', '--tags'))
-        .pipe(gulp.dest('./'));
+        .pipe(git.tag(version, `Release ${version}`), (err) => {
+            if (!err) git.push('origin', 'master', {args: '--tags'});
+        });
 });
 
 gulp.task('npm', ['tag'], (cb) => {
     require('child_process')
-       .spawn('npm', ['publish'], {stdio: 'inherit'})
-       .on('close', cb);
+        .spawn('npm', ['publish'], {stdio: 'inherit'})
+        .on('close', cb);
 });
 
 // Publishes package to npm
