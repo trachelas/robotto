@@ -89,7 +89,7 @@ gulp.task('tag', () => {
     let versionNumber = require('./package.json').version;
     let version = `v${versionNumber}`;
 
-    if (versionNumber !== Object(versionNumber)) {
+    if (typeof versionNumber !== 'string') {
         throw new Error(`Current package.json version is invalid.`);
     }
 
