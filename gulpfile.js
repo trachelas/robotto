@@ -98,7 +98,7 @@ gulp.task('tag', ['bump'], () => {
         .pipe(git.add())
         .pipe(git.commit(`Release ${version}`, {args: '--allow-empty'}))
         .pipe(git.tag(version, `Release ${version}`, {args: '-a'}, (err) => {
-            if (!err) git.push('origin', null, {args: '--follow-tags'});
+            if (!err) git.push('origin', null, {args: '--tags :'});
         }));
 });
 
