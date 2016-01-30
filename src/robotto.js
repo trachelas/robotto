@@ -3,13 +3,37 @@
 const request = require('request');
 const url = require('url');
 
+/**
+ * The main robotto object.
+ * @namespace robotto
+*/
 let robotto = {};
 
+/**
+ * Gets the robots.txt address for any given URL.
+ *
+ * @param {String} url - Any URL.
+ * @returns {String} - The address for the robots.txt file.
+ */
 robotto.getRobotsUrl = function(urlP) {
     let receivedUrl = url.parse(urlP);
     return `${receivedUrl.protocol}\/\/${receivedUrl.host}/robots.txt`;
 };
 
+/**
+ * This is the callback which will be executed after fetching the contents of a robots.txt file through robotto.fetch(<url>).
+ *
+ * @callback robotto~fetchCallback
+ * @param {Object} err - If there were any errors they will be here. Otherwise this will be `null`.
+ * @param {String} contents - The contents of the robots.txt file.
+ */
+
+/**
+ * Fetches the contents of the robots.txt file for a given URL.
+ *
+ * @param {String} url - The robots.txt file URL.
+ * @param {fetchCallback} cb - The callback to handle possible errors and the contents of the robots.txt file.
+ */
 robotto.fetch = function(urlP, callback) {
     callback = typeof callback === 'function' ? callback : new Function();
 
@@ -30,6 +54,26 @@ robotto.fetch = function(urlP, callback) {
     });
 };
 
+/**
+ * A representation of the robots.txt file.
+ * @typedef {Object} robotsRules~robotto
+ * @property {agentRules} userAgents - An object with rules mapped by ther user-agent names.
+ * @property {String[]} comments - An array containing every comment inside the robots.txt file.
+ */
+
+/**
+ * A set of rules for a given user agent.
+ * @typedef {Object} agentRules~robotsRules
+ * @property {String[]} allow - An array with every URL specified into an "allow" rule.
+ * @property {String[]} disallow - An array with every URL specified into a "disallow" rule.
+ */
+
+/**
+ * Creates an object representation of the robots.txt rules.
+ *
+ * @param {String} robotsFile - The contents of any robots.txt file (plaintext).
+ * @returns {robotsRules} rulesObj - An object representation of the robots.txt rules.
+ */
 robotto.parse = function(robotsFile) {
     let lines = robotsFile.split('\n');
     let rulesObj = {
@@ -81,6 +125,18 @@ robotto.parse = function(robotsFile) {
     return rulesObj;
 };
 
+/**
+ * Indicates deepness level for a rule. A rule is composed by a name ('allow' or 'disallow'), an user-agent and an URL.
+ * The greater the deepness level is, the most specific is the rule.
+ * This is important because when we have conflicting 'allow' and 'disallow' rules the most specific one is the one to be taken into account.
+ * This permission level is calculated using the formula: allow deepness - disallow deepness.
+ *
+ * @param {String} ruleName - The rule's name. It can be 'allow' or 'disallow'.
+ * @param {String} userAgent - The user-agent's name.
+ * @param {String} url - The desired URL to check deepness.
+ * @param {robotsRules} rulesObj - An object representation of the robots.txt file rules. It can be created through robotto.parse(<url>).
+ * @returns {Number} ruleDeepness - The deepness level for a rule.
+ */
 robotto.getRuleDeepness = function(ruleName, userAgent, urlParam, rulesObj) {
     // Returns -1 if ruleName is invalid
     ruleName = ruleName.toLowerCase();
@@ -135,6 +191,14 @@ robotto.getRuleDeepness = function(ruleName, userAgent, urlParam, rulesObj) {
     return generalPermission > permission ? generalPermission : permission;
 };
 
+/**
+ * Indicates if an user-agent is allowed to access a given URL.
+ *
+ * @param {String} userAgent - An user-agent name.
+ * @param {String} url - The URL you want to check permissions for.
+ * @param {robotsRules} rulesObj - An object representation of the robots.txt file rules. It can be created through robotto.parse(<url>).
+ * @returns {Boolean} allowed - A boolean indicating if the user-agent is allowed to access an URL.
+ */
 robotto.check = function(userAgent, urlParam, rulesObj) {
     let allowLevel = this.getRuleDeepness('allow', userAgent, urlParam, rulesObj);
     let disallowLevel = this.getRuleDeepness('disallow', userAgent, urlParam, rulesObj);
@@ -146,6 +210,22 @@ robotto.check = function(userAgent, urlParam, rulesObj) {
     return finalPermissionLevel >= 0;
 };
 
+/**
+ * This is the callback which will be executed after verifying crawling permissions for an URL.
+ *
+ * @callback robotto~permissionCallback
+ * @param {Object} err - If there were any errors they will be here. Otherwise this will be `null`.
+ * @param {Boolean} contents - A boolean indicating if the user-agent is allowed to access an URL.
+ */
+
+/**
+ * Indicates if an user-agent can crawl an URL. It fetches rules, parses them and them calculates the permission level
+ * This method aggregates the functionality of every other method above.
+ *
+ * @param {String} userAgent - An user-agent name.
+ * @param {String} url - The URL you want to check permissions for.
+ * @param {fetchCallback} cb - The callback to handle possible errors and the permission (or not) to crawl an URL.
+ */
 robotto.canCrawl = function(userAgent, urlParam, callback) {
     callback = typeof callback === 'function' ? callback : new Function();
 
