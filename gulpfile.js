@@ -96,9 +96,9 @@ gulp.task('tag', ['bump'], () => {
     return gulp.src('./package.json')
         .pipe(git.add())
         .pipe(git.commit(`Release ${version}`, {args: '--allow-empty'}))
-        .pipe(git.tag(version, `Release ${version}`), (err) => {
-            if (!err) git.push('origin', 'master', {args: '--tags'});
-        });
+        .pipe(git.tag(version, `Release ${version}`, {args: '-a'}, (err) => {
+            if (!err) git.push('origin', 'master', {args: version});
+        }));
 });
 
 gulp.task('npm', ['tag'], (cb) => {
