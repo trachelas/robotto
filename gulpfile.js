@@ -86,7 +86,7 @@ gulp.task('bump', () => {
 });
 
 gulp.task('tag', ['bump'], () => {
-    delete require.cache['./package.json'];
+    delete require.cache[require.resolve('./package.json')];
     let versionNumber = require('./package.json').version;
     let version = `v${versionNumber}`;
 
