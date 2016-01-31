@@ -220,10 +220,12 @@ If you find any issues or even if you have a suggestion please feel free to repo
 If you want to write some code follow these steps:
 
 1. Clone this repo using:
+    
     ```
     $ git clone https://github.com/trachelas/robotto
     ```
 2. Go to the folder in which you cloned the repo and install the dev-dependencies:
+    
     ```
     $ npm install
     ```
