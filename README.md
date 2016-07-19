@@ -217,6 +217,25 @@ robotto.canCrawl('https://twitter.com/zenorocha', function(err, isAllowed) {
 Feel free to contribute in any way you want. Every help is valid.
 If you find any issues or even if you have a suggestion please feel free to report it using our [issue tracker](https://github.com/trachelas/robotto/issues).
 
+If you want to write some code follow these steps:
+
+1. Clone this repo using:
+    
+    ```
+    $ git clone https://github.com/trachelas/robotto
+    ```
+2. Go to the folder in which you cloned the repo and install the dev-dependencies:
+    
+    ```
+    $ npm install
+    ```
+3. Write your code
+4. Write tests for it (if needed)
+5. Run `gulp build` and make sure all the tests pass and that you've got 100% code coverage.
+6. Open a [new `pull-request`](https://github.com/trachelas/robotto/pull/new/master)
+
+If you have any doubt please let us know. We'll do our best to explain every detail you need to know in order to contribute.
+
 This is the OpenSource Software's magic :sparkles:
 
 
