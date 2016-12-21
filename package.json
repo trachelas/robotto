@@ -58,6 +58,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "request": "^2.63.0"
+    "request": "^2.79.0"
   }
 }
