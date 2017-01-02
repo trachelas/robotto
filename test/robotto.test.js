@@ -186,7 +186,7 @@ describe('robotto', () => {
                         disallow: ['/first/', '/middle/', '/last/']
                     }
                 }
-            }
+            };
 
             assert.deepEqual(robotto.parse(robotsFile), expectedRules);
         });
