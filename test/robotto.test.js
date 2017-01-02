@@ -167,6 +167,29 @@ describe('robotto', () => {
         it('should actually parse a robots.txt file', () => {
             assert.deepEqual(robotto.parse(fake.robots()), fake.rules());
         });
+
+        it('should add repeated user agent rules to the same user agent as before', () => {
+            let robotsFile = [
+                'User-agent: *',
+                'Disallow: /first/',
+                'User-agent: *',
+                'Disallow: /middle/',
+                'User-agent: *',
+                'Disallow: /last/',
+            ].join('\n');
+
+            let expectedRules = {
+                comments: [],
+                userAgents: {
+                    '*': {
+                        allow: [],
+                        disallow: ['/first/', '/middle/', '/last/']
+                    }
+                }
+            };
+
+            assert.deepEqual(robotto.parse(robotsFile), expectedRules);
+        });
     });
 
     describe('getRuleDeepness', () => {
