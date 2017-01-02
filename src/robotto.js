@@ -58,10 +58,12 @@ robotto.parse = function(robotsFile) {
         let userAgentIndex = line.toLowerCase().indexOf('user-agent:');
         if (userAgentIndex === 0) {
             lastUserAgent = line.split(':')[1].trim();
-            rulesObj.userAgents[lastUserAgent] = {
-                allow: [],
-                disallow: []
-            };
+            if (rulesObj.userAgents[lastUserAgent] === undefined) {
+                rulesObj.userAgents[lastUserAgent] = {
+                    allow: [],
+                    disallow: []
+                };
+            }
             return;
         }
 
