@@ -13,7 +13,11 @@ robotto.getRobotsUrl = function(urlP) {
 robotto.fetch = function(urlP, callback) {
     callback = typeof callback === 'function' ? callback : new Function();
 
-    let robotsUrl = this.getRobotsUrl(urlP);
+    let robotsUrl = {
+        url:this.getRobotsUrl(urlP),
+        maxRedirects:4,
+    };
+
 
     request.get(robotsUrl, (err, res, body) => {
         if (err) {
