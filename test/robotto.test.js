@@ -44,7 +44,7 @@ describe('robotto', () => {
 
         it('should call request.get', (done) => {
             robotto.fetch(coolUrl, () => {
-                sinon.assert.calledWith(request.get, coolRobot);
+                sinon.assert.calledWith(request.get, { url: coolRobot, maxRedirects: 5 });
                 done();
             });
         });
