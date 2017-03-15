@@ -51,7 +51,7 @@
     "gulp-sequence": "^0.4.4",
     "gulp-shell": "^0.6.1",
     "gulp-util": "^3.0.7",
-    "sinon": "^1.17.1"
+    "sinon": "^2.0.0"
   },
   "scripts": {
     "test": "gulp test"

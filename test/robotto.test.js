@@ -384,7 +384,7 @@ describe('robotto', () => {
 
     describe('check', () => {
         it('should find an allowed route', () => {
-            sandbox.stub(robotto, 'getRuleDeepness', (rule) => {
+            sandbox.stub(robotto, 'getRuleDeepness').callsFake(rule => {
                 return rule === 'allow' ? 1 : 0;
             });
 
@@ -396,7 +396,7 @@ describe('robotto', () => {
         });
 
         it('should find a disallowed route', () => {
-            sandbox.stub(robotto, 'getRuleDeepness', (rule) => {
+            sandbox.stub(robotto, 'getRuleDeepness').callsFake(rule => {
                 return rule === 'disallow' ? 1 : 0;
             });
 
