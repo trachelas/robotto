@@ -36,7 +36,7 @@
     "bot"
   ],
   "devDependencies": {
-    "chai": "^3.4.0",
+    "chai": "^4.0.1",
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.0",
     "gulp-bump": "^2.2.0",
