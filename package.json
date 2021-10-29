@@ -45,7 +45,7 @@
     "gulp-exclude-gitignore": "^1.0.0",
     "gulp-git": "^2.0.0",
     "gulp-istanbul": "^1.1.0",
-    "gulp-mocha": "^4.2.0",
+    "gulp-mocha": "^4.3.0",
     "gulp-nsp": "^2.3.1",
     "gulp-plumber": "^1.0.0",
     "gulp-sequence": "^0.4.4",
